@@ -1,0 +1,242 @@
+import java.util.Random;
+
+public class Board {
+  /**********
+  *Variables*
+  ***********/
+  //Integers
+  private int width;
+  private int height;
+  private int bombCount;
+  
+  //Board Array
+  private Location[][] board;
+  
+  
+  /*************
+  *Constructors*
+  **************/
+  //Constructor called when no arguments are passed that
+  //sets all value to their defaults
+  public Board() {
+    this.width = 8;
+    this.height = 8;
+    this.bombCount = determineBombCount(this.width, this.height);
+    board = new Location[this.width][this.height];
+    for (int i = 0; i < width; i++) {
+      for (int j = 0; j < height; j++) {
+	board[i][j] = new Location();
+      }
+    }
+  }
+  
+  //Constructor for creating the board when only one
+  //dimension (width or height) is passed. Assumes
+  //both dimensions are the same (i.e. width = height).
+  public Board(int dimension) {
+    this.width = dimension;
+    this.height = dimension;
+    this.bombCount = determineBombCount(this.width, this.height);
+    board = new Location[this.width][this.height];
+    for (int i = 0; i < width; i++) {
+      for (int j = 0; j < height; j++) {
+	board[i][j] = new Location();
+      }
+    }
+  }
+  
+  //Constructor called when both width and height are
+  //specified.
+  public Board(int width, int height) {
+    this.width = width;
+    this.height = height;
+    this.bombCount = determineBombCount(this.width, this.height);
+    board = new Location[this.width][this.height];
+    for (int i = 0; i < width; i++) {
+      for (int j = 0; j < height; j++) {
+	board[i][j] = new Location();
+      }
+    }
+  }
+  
+  /**********
+  *Functions*
+  ***********/
+  //Formula to determine how many bombs should be on the board.
+  //Returns this value as an integer.
+  private int determineBombCount(int width, int height) {
+    //Variables
+    Random rand = new Random();
+    int seed = 0;
+    int value = width * height;
+    
+    //Stay in the loop until the number of value is under
+    //a certain size. This allows the amount of bombs to
+    //be somewhat random, but within an acceptable range
+    //(i.e. not having too many bombs that would cause
+    //the game to be unfun to play).
+    while (value > (width * height) / 4) {
+      //Generate random seed
+      while (seed == 0) {
+	if(rand.nextInt() == 1) {
+	  seed = rand.nextInt(width);
+	}
+	
+	else {
+	  seed = rand.nextInt(height);
+	}
+      }
+      
+      //Set the number of bombs based on the seed
+      value = (width * height) / (seed * 2);
+    }
+    
+    //Return the value
+    return value;
+  }
+  
+  /**Board Reset**/
+  //Creates a new board with the same dimensions as the
+  //current board
+  public void resetBoard() {
+    board = new Location[this.width][this.height];
+    for(int i = 0; i < this.width; i++) {
+      for(int j = 0; j < this.height; j++) {
+	board[i][j] = new Location();
+      }
+    }
+    
+    this.bombCount = determineBombCount(this.width, this.height);
+  }
+  
+  //Creates a new board with the specified dimensions,
+  //throwing away the dimensions of the current board
+  public void resetBoard(int width, int height) {
+    board = new Location[width][height];
+    this.width = width;
+    this.height = height;
+    for(int i = 0; i < this.width; i++) {
+      for(int j = 0; j < this.height; j++) {
+	board[i][j] = new Location();
+      }
+    }
+    
+    this.bombCount = determineBombCount(this.width, this.height);
+  }
+  
+  /**Getters**/
+  //Get the total number of bombs in the game
+  public int returnBombCount() {
+    return bombCount;
+  }
+  
+  //Get the width of the board
+  public int returnWidth() {
+    return this.width;
+  }
+  
+  //Get the height of the board
+  public int returnHeight() {
+    return this.height;
+  }
+  
+  //Return total size of the board
+  public int returnSize() {
+    return this.width * this.height;
+  }
+  
+  /**Setters**/
+  
+  
+  /*******
+  *Driver*
+  ********/
+  public static void main(String[] args) {
+    System.out.println("This main is just a driver and should");
+    System.out.println("not be called except for debugging.");
+    
+    int width = 24;
+    int height = 24;
+    
+    System.out.println("==Empty Constructor Tests============");
+    Board emptyTest = new Board();
+    System.out.println("Number of bombs: " + emptyTest.returnBombCount());
+    System.out.println("Width: " + emptyTest.returnWidth());
+    System.out.println("Height: " + emptyTest.returnHeight());
+    System.out.println("Size: " + emptyTest.returnSize());
+    
+    
+    System.out.println();
+    System.out.println("==One-Dimension Constructor Test=====");
+    Board oneTest = new Board(width / 2);
+    System.out.println("Number of bombs: " + oneTest.returnBombCount());
+    System.out.println("Width: " + oneTest.returnWidth());
+    System.out.println("Height: " + oneTest.returnHeight());
+    System.out.println("Size: " + oneTest.returnSize());
+    
+    
+    System.out.println();
+    System.out.println("==Two-Dimension Constructor Test=====");
+    Board twoTest = new Board(width, height);
+    System.out.println("Number of bombs: " + twoTest.returnBombCount());
+    System.out.println("Width: " + twoTest.returnWidth());
+    System.out.println("Height: " + twoTest.returnHeight());
+    System.out.println("Size: " + twoTest.returnSize());
+    
+    
+    //Test resetting the board
+    System.out.println("Testing resetting the board.");
+    
+    System.out.println();
+    System.out.println("==Resetting - Same Dimensions========");
+    
+    emptyTest.resetBoard();
+    System.out.println("Empty Constructor:");
+    System.out.println("Number of bombs: " + emptyTest.returnBombCount());
+    System.out.println("Width: " + emptyTest.returnWidth());
+    System.out.println("Height: " + emptyTest.returnHeight());
+    System.out.println("Size: " + emptyTest.returnSize());
+    
+    oneTest.resetBoard();
+    System.out.println("One-Dimension Constructor:");
+    System.out.println("Number of bombs: " + oneTest.returnBombCount());
+    System.out.println("Width: " + oneTest.returnWidth());
+    System.out.println("Height: " + oneTest.returnHeight());
+    System.out.println("Size: " + oneTest.returnSize());
+    
+    twoTest.resetBoard();
+    System.out.println("Two-Dimension Constructor:");
+    System.out.println("Number of bombs: " + twoTest.returnBombCount());
+    System.out.println("Width: " + twoTest.returnWidth());
+    System.out.println("Height: " + twoTest.returnHeight());
+    System.out.println("Size: " + twoTest.returnSize());
+    
+    System.out.println();
+    System.out.println("==Resetting - Diff Dimesnions========");
+    
+    width = width / 2;
+    height = height / 2;
+    
+    emptyTest.resetBoard(width, height);
+    System.out.println("Empty Constructor:");
+    System.out.println("Number of bombs: " + emptyTest.returnBombCount());
+    System.out.println("Width: " + emptyTest.returnWidth());
+    System.out.println("Height: " + emptyTest.returnHeight());
+    System.out.println("Size: " + emptyTest.returnSize());
+    
+    oneTest.resetBoard(width, height);
+    System.out.println("One-Dimension Constructor:");
+    System.out.println("Number of bombs: " + oneTest.returnBombCount());
+    System.out.println("Width: " + oneTest.returnWidth());
+    System.out.println("Height: " + oneTest.returnHeight());
+    System.out.println("Size: " + oneTest.returnSize());
+    
+    twoTest.resetBoard(width, height);
+    System.out.println("Two-Dimension Constructor:");
+    System.out.println("Number of bombs: " + twoTest.returnBombCount());
+    System.out.println("Width: " + twoTest.returnWidth());
+    System.out.println("Height: " + twoTest.returnHeight());
+    System.out.println("Size: " + twoTest.returnSize());
+    
+  }
+}

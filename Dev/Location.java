@@ -35,17 +35,17 @@ public class Location
 	//	Getters
 	public Boolean hasFlag()
 	{
-		return flag;
+		return this.flag;
 	}
 	
 	public Boolean hasBomb()
 	{
-		return bomb;
+		return this.bomb;
 	}
 	
 	public Boolean hasNumber()
 	{
-		return numberBool;
+		return this.numberBool;
 	}
 	
 	// Setters
@@ -63,7 +63,7 @@ public class Location
 	public Boolean setBomb(boolean bomb)
 	{
 		this.bomb = bomb;
-		return this.bomb;
+		return true;
 	}
 	
 	// Returns a boolean so that you know whether not the number in the

@@ -35,41 +35,17 @@ public class Location
 	//	Getters
 	public Boolean hasFlag()
 	{
-		if (flag)
-		{
-			return true;
-		}
-		
-		else
-		{
-			return false;
-		}
+		return flag;
 	}
 	
 	public Boolean hasBomb()
 	{
-		if (bomb)
-		{
-			return true;
-		}
-		
-		else
-		{
-			return false;
-		}
+		return bomb;
 	}
 	
 	public Boolean hasNumber()
 	{
-		if (numberBool)
-		{
-			return true;
-		}
-		
-		else
-		{
-			return false;
-		}
+		return numberBool;
 	}
 	
 	// Setters
@@ -87,7 +63,7 @@ public class Location
 	public Boolean setBomb(boolean bomb)
 	{
 		this.bomb = bomb;
-		return true;
+		return this.bomb;
 	}
 	
 	// Returns a boolean so that you know whether not the number in the

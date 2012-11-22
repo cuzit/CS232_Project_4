@@ -113,14 +113,33 @@ public class Board {
   private void placeBombs() {
     int x;
     int y;
+    Boolean success;
     for(int i = 0; i < this.bombCount; i++) {
       do {
+	success = false;
 	x = rand.nextInt(this.width);
 	y = rand.nextInt(this.height);
 	if (!board[x][y].hasBomb()) {
 	  board[x][y].setBomb(true);
+	  success = true;
 	}
-      } while(board[x][y].hasBomb() == true);
+      } while(success == false);
+    }
+  }
+  
+  //Determine a spot's distance from the nearest bomb
+  private int determineNearestBomb(int x, int y) {
+    if (board[x][y].hasBomb() == true) {
+      board[x][y].setNumber(0);
+    }
+    
+    else {
+      int closest = 0;
+      for(int i = x; i == 0 || i == (x-5); i++) {
+	if(board[x - i][y].hasBomb() || board[x + i][y].hasBomb()) {
+	  closest = x;
+	}
+      }
     }
   }
   
@@ -191,7 +210,9 @@ public class Board {
     
     for(int i = 0; i < this.width + 2; i++) {
       s += "-";
-    }   
+    }
+    
+    s += "\n";
     
     for(int i = 0; i < this.width; i++) {
       s += "|";

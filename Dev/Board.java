@@ -35,6 +35,13 @@ public class Board {
       }
     }
     placeBombs();
+    
+    for(int i = 0; i < width; i++) {
+      for(int j = 0; j < height; j++) {
+	int temp = determineNearestBomb(i, j);
+	board[i][j].setNumber(temp);
+      }
+    }
   }
   
   //Constructor for creating the board when only one
@@ -54,6 +61,13 @@ public class Board {
       }
     }
     placeBombs();
+    
+    for(int i = 0; i < width; i++) {
+      for(int j = 0; j < height; j++) {
+	int temp = determineNearestBomb(i, j);
+	board[i][j].setNumber(temp);
+      }
+    }
   }
   
   //Constructor called when both width and height are
@@ -72,6 +86,13 @@ public class Board {
       }
     }
     placeBombs();
+    
+    for(int i = 0; i < width; i++) {
+      for(int j = 0; j < height; j++) {
+	int temp = determineNearestBomb(i, j);
+	board[i][j].setNumber(temp);
+      }
+    }
   }
   
   /**********
@@ -129,17 +150,30 @@ public class Board {
   
   //Determine a spot's distance from the nearest bomb
   private int determineNearestBomb(int x, int y) {
+    //System.out.println("x = " + x + ". y = " + y + ".");
+    
     if (board[x][y].hasBomb() == true) {
-      board[x][y].setNumber(0);
+      return 0;
     }
     
     else {
-      int closest = 0;
-      for(int i = x; i == 0 || i == (x-5); i++) {
-	if(board[x - i][y].hasBomb() || board[x + i][y].hasBomb()) {
-	  closest = x;
+      int max_distance = 5;
+      int closest = max_distance;
+      
+      for(int i = 0; i < max_distance + 1; i++) {
+	for(int j = 0; j < max_distance + 1; j++) {
+	  if(x - i >= 0 && x + i <= this.width - 1
+	      && y - i >= 0 && y + i <= this.height - 1) {
+	    if(board[i][j].hasBomb()) {
+	      if(i + 1 < closest) {
+		closest = i + 1;
+	      }
+	    }
+	  }
 	}
       }
+      
+      return closest;
     }
   }
   
@@ -159,6 +193,13 @@ public class Board {
     
     placeBombs();
     this.bombCount = determineBombCount();
+    
+    for(int i = 0; i < width; i++) {
+      for(int j = 0; j < height; j++) {
+	int temp = determineNearestBomb(i, j);
+	board[i][j].setNumber(temp);
+      }
+    }
   }
   
   //Creates a new board with the specified dimensions,
@@ -178,6 +219,13 @@ public class Board {
     
     placeBombs();
     this.bombCount = determineBombCount();
+    
+    for(int i = 0; i < width; i++) {
+      for(int j = 0; j < height; j++) {
+	int temp = determineNearestBomb(i, j);
+	board[i][j].setNumber(temp);
+      }
+    }
   }
   
   /**Getters**/
@@ -201,6 +249,21 @@ public class Board {
     return this.width * this.height;
   }
   
+  //Return whether or not a bomb exists at a location
+  public boolean returnBomb(int x, int y) {
+    return board[x][y].hasBomb();
+  }
+  
+  //Return whether or not a flag exists at a location
+  public boolean returnFlag(int x, int y) {
+    return board[x][y].hasFlag();
+  }
+  
+  //Return the distance to the closest bomb at a location
+  public int returnNumber(int x, int y) {
+    return board[x][y].getNumber();
+  }
+  
   /**Setters**/
   
   
@@ -208,7 +271,7 @@ public class Board {
   public String toString() {
     String s = "";
     
-    for(int i = 0; i < this.width + 2; i++) {
+    for(int i = 0; i < (this.width * 2) + 2; i++) {
       s += "-";
     }
     
@@ -218,22 +281,22 @@ public class Board {
       s += "|";
       for(int j = 0; j < this.height; j++) {
 	if(board[i][j].hasBomb() == true) {
-	  s += "*";
+	  s += "* ";
 	}
 	
 	else if (board[i][j].hasFlag()) {
-	  s += "F";
+	  s += "F ";
 	}
 	
 	else {
-	  s += board[i][j].getNumber();
+	  s += board[i][j].getNumber() + " ";
 	}
       }
       
       s += "|\n";
     }
     
-    for(int i = 0; i < this.width + 2; i++) {
+    for(int i = 0; i < (this.width * 2) + 2; i++) {
       s += "-";
     }
     

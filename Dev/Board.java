@@ -38,7 +38,7 @@ public class Board {
     
     for(int i = 0; i < width; i++) {
       for(int j = 0; j < height; j++) {
-	int temp = determineNearestBomb(i, j);
+	int temp = determineNumberOfNearbyMines(i, j);
 	board[i][j].setNumber(temp);
       }
     }
@@ -64,7 +64,7 @@ public class Board {
     
     for(int i = 0; i < width; i++) {
       for(int j = 0; j < height; j++) {
-	int temp = determineNearestBomb(i, j);
+	int temp = determineNumberOfNearbyMines(i, j);
 	board[i][j].setNumber(temp);
       }
     }
@@ -89,7 +89,7 @@ public class Board {
     
     for(int i = 0; i < width; i++) {
       for(int j = 0; j < height; j++) {
-	int temp = determineNearestBomb(i, j);
+	int temp = determineNumberOfNearbyMines(i, j);
 	board[i][j].setNumber(temp);
       }
     }
@@ -103,14 +103,14 @@ public class Board {
   private int determineBombCount() {
     //Variables
     int seed = 0;
-    int value = this.width * this.height;
+    int value;
     
     //Stay in the loop until the number of value is under
     //a certain size. This allows the amount of bombs to
     //be somewhat random, but within an acceptable range
     //(i.e. not having too many bombs that would cause
     //the game to be unfun to play).
-    while (value > (this.width * this.height) / 4) {
+    do {
       //Generate random seed
       while (seed == 0) {
 	if(rand.nextInt() == 1) {
@@ -123,8 +123,8 @@ public class Board {
       }
       
       //Set the number of bombs based on the seed
-      value = (this.width * this.height) / (seed * 2);
-    }
+      value = ((this.width * this.height) / (seed * 2));
+    } while (value > (this.width * this.height) / 3);
     
     //Return the value
     return value;
@@ -141,40 +141,40 @@ public class Board {
 	x = rand.nextInt(this.width);
 	y = rand.nextInt(this.height);
 	if (!board[x][y].hasBomb()) {
-	  board[x][y].setBomb(true);
-	  success = true;
+	  success = board[x][y].setBomb(true);
 	}
       } while(success == false);
     }
   }
   
-  //Determine a spot's distance from the nearest bomb
-  private int determineNearestBomb(int x, int y) {
-    //System.out.println("x = " + x + ". y = " + y + ".");
+  //Determine the number of adjacent cells that contain mines
+  private int determineNumberOfNearbyMines(int x, int y) {
+    int count = 0; //Counts the number of nearby mines
     
-    if (board[x][y].hasBomb() == true) {
-      return 0;
-    }
-    
-    else {
-      int max_distance = 5;
-      int closest = max_distance;
-      
-      for(int i = 0; i < max_distance + 1; i++) {
-	for(int j = 0; j < max_distance + 1; j++) {
-	  if(x - i >= 0 && x + i <= this.width - 1
-	      && y - i >= 0 && y + i <= this.height - 1) {
+    //Go through each row, starting one position to the left
+    //of the x value passed and ending one position to the right
+    for(int i = (x - 1); i < (x + 2); i++) {
+      //Check to see if the i value is actually within the
+      //grid (i.e. if x=0, i = x - 1 = -1, i cannot be -1).
+      if(i >= 0 && i < this.width) {
+	//Go through each column (of each row), starting one
+	//position up from the y value passed and ending
+	//one position down.
+	for(int j = (y - 1); j < (y + 2); j++) {
+	  //Check if j is within an acceptable range.
+	  if(j >= 0 && j < this.height) {
+	    //If the position contains a bomb, increase
+	    //count by 1.
 	    if(board[i][j].hasBomb()) {
-	      if(i + 1 < closest) {
-		closest = i + 1;
-	      }
+	      count++;
 	    }
 	  }
 	}
       }
-      
-      return closest;
     }
+    
+    //Return the number of mines
+    return count;
   }
   
   /**Board Reset**/
@@ -196,7 +196,7 @@ public class Board {
     
     for(int i = 0; i < width; i++) {
       for(int j = 0; j < height; j++) {
-	int temp = determineNearestBomb(i, j);
+	int temp = determineNumberOfNearbyMines(i, j);
 	board[i][j].setNumber(temp);
       }
     }
@@ -222,7 +222,7 @@ public class Board {
     
     for(int i = 0; i < width; i++) {
       for(int j = 0; j < height; j++) {
-	int temp = determineNearestBomb(i, j);
+	int temp = determineNumberOfNearbyMines(i, j);
 	board[i][j].setNumber(temp);
       }
     }

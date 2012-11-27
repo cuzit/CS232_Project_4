@@ -136,11 +136,11 @@ public class Board {
     int y;
     Boolean success;
     for(int i = 0; i < this.bombCount; i++) {
+      success = false;
       do {
-	success = false;
 	x = rand.nextInt(this.width);
 	y = rand.nextInt(this.height);
-	if (!board[x][y].hasBomb()) {
+	if (board[x][y].hasBomb() == false) {
 	  success = board[x][y].setBomb(true);
 	}
       } while(success == false);
@@ -191,8 +191,8 @@ public class Board {
       }
     }
     
-    placeBombs();
     this.bombCount = determineBombCount();
+    placeBombs();
     
     for(int i = 0; i < width; i++) {
       for(int j = 0; j < height; j++) {
@@ -217,8 +217,8 @@ public class Board {
       }
     }
     
-    placeBombs();
     this.bombCount = determineBombCount();
+    placeBombs();
     
     for(int i = 0; i < width; i++) {
       for(int j = 0; j < height; j++) {
@@ -231,7 +231,7 @@ public class Board {
   /**Getters**/
   //Get the total number of bombs in the game
   public int returnBombCount() {
-    return bombCount;
+    return this.bombCount;
   }
   
   //Get the width of the board

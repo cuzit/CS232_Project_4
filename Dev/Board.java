@@ -270,6 +270,13 @@ public class Board {
     board[x][y].setFlag(flag_value);
   }
   
+  //Change the number at a certain location, primarily
+  //called by the Cascade function to make it work.
+  //Do not call this function otherwise.
+  public void setNumber(int x, int y, int number) {
+    board[x][y].setNumber(number);
+  }
+  
   /**toString**/
   public String toString() {
     String s = "";

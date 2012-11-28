@@ -44,13 +44,18 @@ public class Board {
     }
   }
   
-  //Constructor for creating the board when only one
-  //dimension (width or height) is passed. Assumes
-  //both dimensions are the same (i.e. width = height).
-  public Board(int dimension) {
-    this.width = dimension;
-    this.height = dimension;
-    this.bombCount = determineBombCount();
+  //Constructor for creating the board when the number of
+  //mines is specified. Both dimensions must be given.
+  public Board(int width, int height, int bombCount) {
+    this.width = width;
+    this.height = height;
+    if(bombCount > this.width * this.height) {
+      System.out.println("Can't have more bombs than there are spaces in the game!");
+      this.bombCount = determineBombCount();
+    }
+    else {
+      this.bombCount = bombCount;
+    }
     board = new Location[this.width][this.height];
     for (int i = 0; i < width; i++) {
       for (int j = 0; j < height; j++) {
@@ -253,6 +258,38 @@ public class Board {
     }
   }
   
+  //Creates a new board with the specified dimensions
+  //and the specified bomb count, throwing away the
+  //values of the current board
+  public void resetBoard(int width, int height, int bombCount) {
+    board = new Location[width][height];
+    this.width = width;
+    this.height = height;
+    for(int i = 0; i < this.width; i++) {
+      for(int j = 0; j < this.height; j++) {
+	board[i][j] = new Location();
+	board[i][j].setFlag(false);
+	board[i][j].setBomb(false);
+	board[i][j].setNumber(-1);
+      }
+    }
+    
+    if(bombCount > this.width * this.height) {
+      System.out.println("Too many bombs to fit on the board!");
+      this.bombCount = determineBombCount();
+    }
+    else {
+      this.bombCount = bombCount;
+    }
+    placeBombs();
+    for(int i = 0; i < width; i++) {
+      for(int j = 0; j < height; j++) {
+	int temp = determineNumberOfNearbyMines(i, j);
+	board[i][j].setNumber(temp);
+      }
+    }
+  }
+  
   /**Getters**/
   //Get the total number of bombs in the game
   public int returnBombCount() {
@@ -360,7 +397,7 @@ public class Board {
     
     System.out.println();
     System.out.println("==One-Dimension Constructor Test=====");
-    Board oneTest = new Board(width / 2);
+    Board oneTest = new Board(width, height, width * height / 4);
     System.out.println("Number of bombs: " + oneTest.returnBombCount());
     System.out.println("Width: " + oneTest.returnWidth());
     System.out.println("Height: " + oneTest.returnHeight());

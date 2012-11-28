@@ -6,7 +6,7 @@ import java.util.Scanner;
 import javax.swing.*;
 
 
-public class BoardUI extends JFrame {
+public class BoardUI extends JFrame implements ActionListener{
 
     private JMenu options = new JMenu("Game");
     private JMenuItem startNew = new JMenuItem("Start New Game");
@@ -17,7 +17,8 @@ public class BoardUI extends JFrame {
     private JLabel mineLabel = new JLabel ("--");
     private Timer timer;
     private Board board;
-	private Location[][] grid;
+	private Location grid[][];
+	private Cascade collapse;
 	private ImageIcon flagIcon;
 	private Timer clock;
 	private Boolean started;
@@ -28,7 +29,7 @@ public class BoardUI extends JFrame {
 		this.width = width;
 		this.height = height;
 
-	// creates the frame and ads the componets to the frame
+		// creates the frame and ads the componets to the frame
         setLayout(new BorderLayout());
         JPanel topPanel = new JPanel();
 		JPanel bottomPanel = new JPanel();
@@ -63,97 +64,98 @@ public class BoardUI extends JFrame {
 		
 		layout.setLayout(new GridLayout(width,height));
 		board = new Board(width, height);
-		grid = new Location(width, height);
+		grid = new Location[width][height];
 		JButton[][] buttons = new JButton[width][height];
 		for(int i = 0; i < width; i++)
 			{
-			for( int j = 0; j < height; j++)
+				for( int j = 0; j < height; j++)
 				{
 					buttons[i][j] = new JButton();
 					buttons[i][j].addActionListener(this);
 					layout.add(buttons[i][j]);
-					}
+				
+					buttons[i][j].addMouseListener(new MouseAdapter()
+					{
+						//mouse
+						public void mousePressed (MouseEvent e) 
+						{	
+							if(!started)
+							{
+								clock = new Timer(1000, timerActionListener);
+								clock.start();
+								started = true;
+							}
+							int width = 0;
+							int height = 0;
+							for(int i = 0;i < width;i++) 
+							{
+								for(int j = 0;j < height;j++) 
+								{
+									if(e.getSource().equals(grid[i][j]))
+									{
+										width = i;
+										height = j;
+									}
+								}
+								
+							}
+							if(e.getButton() == MouseEvent.BUTTON1) 
+							{ 
+								if(grid[width][height].hasNumber())
+								{
+									int num = board.returnNumber(width, height);
+									switch(num)
+									{
+										case 1:flagIcon = new ImageIcon("1.png");
+										case 2:flagIcon = new ImageIcon("2.png");
+										case 3:flagIcon = new ImageIcon("3.png");
+										case 4:flagIcon = new ImageIcon("4.png");
+										case 5:flagIcon = new ImageIcon("5.png");
+										case 6:flagIcon = new ImageIcon("6.png");
+										case 7:flagIcon = new ImageIcon("7.png");
+										case 8:flagIcon = new ImageIcon("8.png");
+									}
+									
+									// After the number is shown cascade the surrounding numbers
+									collapse.cascade(width,height);
+								}
+								if(!board.determineWinner())
+								{
+									JOptionPane.showMessageDialog(null,"Game Over!","",JOptionPane.INFORMATION_MESSAGE);
+									board.resetBoard();
+								}
+								if(board.determineWinner())
+								{
+									JOptionPane.showMessageDialog(null, "CONGRATULATIONS!", "You have won the game! Starting a new game now.", JOptionPane.INFORMATION_MESSAGE);
+									board.resetBoard();
+								}
+							}
+							else if(e.getButton() == MouseEvent.BUTTON3) 
+							{
+								if(flagsAvailable())
+								{
+									if(!board.returnFlag(width, height))
+									{
+										board.setFlag(width, height, true);
+										ImageIcon flagIcon = new ImageIcon("flag.png");
+									}
+									else 
+									{
+										 
+											board.setFlag(width, height, false);
+									}	
+								}
+							}
+							updateMineNum();
+						}
+					});
 				}
+			}
 		bottomPanel.add(layout);
         add(topPanel, BorderLayout.NORTH);
 		add(bottomPanel, BorderLayout.SOUTH);
         
 		started = false;
-		buttons.addMouseListener(new MouseAdapter()
-		{
-			//mouse
-			public void mousePressed (MouseEvent e) 
-			{	
-			
-				if(!started)
-				{
-					clock = new Timer(1000, timerActionListener);
-					clock.start();
-					started = true;
-				}
-				int width = 0;
-				int height = 0;
-				for(int i = 0;i < width;i++) 
-				{
-					for(int j = 0;j < height;j++) 
-					{
-						if(e.getSource().equals(grid[i][j]))
-						{
-							width = i;
-							height = j;
-						}
-					}
-					
-				}
-				if(e.getButton() == MouseEvent.BUTTON1) 
-				{ 
-					cascade(width,height);
-					board[width][height].show(grid[width][height]);
-					if(grid[width][height].hasNumber())
-					{
-						int num = grid.getNumber();
-						switch(num)
-						{
-							case 1:flagIcon = new ImageIcon("1.png");
-							case 2:flagIcon = new ImageIcon("2.png");
-							case 3:flagIcon = new ImageIcon("3.png");
-							case 4:flagIcon = new ImageIcon("4.png");
-							case 5:flagIcon = new ImageIcon("5.png");
-							case 6:flagIcon = new ImageIcon("6.png");
-							case 7:flagIcon = new ImageIcon("7.png");
-							case 8:flagIcon = new ImageIcon("8.png");
-						}
-					}
-					if(grid[width][height] == -1)
-					{
-						JOptionPane.showMessageDialog(this,"Game Over!","",JOptionPane.INFORMATION_MESSAGE);
-						board.resetBoard();
-					}
-					if(isWinner())
-					{
-						JOptionPane.showMessageDialog(this, "YOU WIN! Starting New Game", "CONGRATULATIONS", JOptionPane.INFORMATION_MESSAGE);
-						board.resetBoard();
-					}
-				}
-				else if(e.getButton() == MouseEvent.BUTTON3) 
-				{
-					if(flagsAvailable())
-					{
-						if(!grid[width][height].hasFlag())
-						{
-							grid[width][height].setFlag(true);
-							ImageIcon flagIcon = new ImageIcon("flag.png");
-						}
-						else 
-						{
-							 
-								board[width][height].setFlag(false);
-						}	
-					}
-				}
-				updateMineNum();
-			}
-		});
 		
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         pack();
@@ -259,12 +261,12 @@ private int numFlags()
 	}
 	private void updateMineNum() 
 	{
-		int count = board.determineBombCount - numFlags();
+		int count = board.determineBombCount() - numFlags();
 		mineLabel.setText(String.valueOf(count));			
 	}
 	private boolean flagsAvailable() 
 	{
-		if((board.determineBombCount - numFlags()) > 0)
+		if((board.determineBombCount() - numFlags()) > 0)
 			return true;
 		else 
 			return false;

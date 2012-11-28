@@ -464,7 +464,7 @@ public class Board {
       }
     }
     System.out.println(twoTest.toString());
-    test = twoTest.determineWinner();
+    boolean test = twoTest.determineWinner();
     if(test) { System.out.println("The game is won!"); }
     else { System.out.println("The game has not been won."); }
   }

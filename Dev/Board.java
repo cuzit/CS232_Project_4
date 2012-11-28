@@ -100,7 +100,7 @@ public class Board {
   ***********/
   //Formula to determine how many bombs should be on the board.
   //Returns this value as an integer.
-  private int determineBombCount() {
+  public int determineBombCount() {
     //Variables
     int seed = 0;
     int value;

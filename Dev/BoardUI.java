@@ -1,4 +1,3 @@
-
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -7,7 +6,7 @@ import java.util.Scanner;
 import javax.swing.*;
 
 
-public class BoardUI extends JFrame implements ActionListener {
+public class BoardUI extends JFrame {
 
     private JMenu options = new JMenu("Game");
     private JMenuItem startNew = new JMenuItem("Start New Game");
@@ -18,19 +17,29 @@ public class BoardUI extends JFrame implements ActionListener {
     private JLabel mineLabel = new JLabel ("--");
     private Timer timer;
     private Board board;
-    private boolean isGameStarted = false;
+	private Location[][] grid;
+	private ImageIcon flagIcon;
+	private Timer clock;
+	private Boolean started;
+	private int width;
+	private int height;
     
-    public BoardUI(){
-     // creates the frame and ads the componets to the frame
+    public BoardUI(int width, int height){
+		this.width = width;
+		this.height = height;
+
+	// creates the frame and ads the componets to the frame
         setLayout(new BorderLayout());
         JPanel topPanel = new JPanel();
+		JPanel bottomPanel = new JPanel();
         topPanel.setLayout(new BorderLayout());
         
         JPanel bottom = new JPanel();
+		JPanel layout = new JPanel();
         bottom.setLayout(new FlowLayout());
         JPanel top = new JPanel();
         top.setLayout(new BorderLayout());
-                
+               
         JMenuBar bar = new JMenuBar();
         options.add(startNew);
         options.add(resetGame);
@@ -51,8 +60,101 @@ public class BoardUI extends JFrame implements ActionListener {
         topPanel.add(top, BorderLayout.NORTH);
         topPanel.add(bottom, BorderLayout.SOUTH);
         
+		
+		layout.setLayout(new GridLayout(width,height));
+		board = new Board(width, height);
+		grid = new Location(width, height);
+		JButton[][] buttons = new JButton[width][height];
+		for(int i = 0; i < width; i++)
+			{
+			for( int j = 0; j < height; j++)
+				{
+					buttons[i][j] = new JButton();
+					buttons[i][j].addActionListener(this);
+					layout.add(buttons[i][j]);
+					}
+				}
+		bottomPanel.add(layout);
         add(topPanel, BorderLayout.NORTH);
+		add(bottomPanel, BorderLayout.SOUTH);
         
+		started = false;
+		buttons.addMouseListener(new MouseAdapter()
+		{
+			//mouse
+			public void mousePressed (MouseEvent e) 
+			{	
+			
+				if(!started)
+				{
+					clock = new Timer(1000, timerActionListener);
+					clock.start();
+					started = true;
+				}
+				int width = 0;
+				int height = 0;
+				for(int i = 0;i < width;i++) 
+				{
+					for(int j = 0;j < height;j++) 
+					{
+						if(e.getSource().equals(grid[i][j]))
+						{
+							width = i;
+							height = j;
+						}
+					}
+					
+				}
+				if(e.getButton() == MouseEvent.BUTTON1) 
+				{ 
+					cascade(width,height);
+					board[width][height].show(grid[width][height]);
+					if(grid[width][height].hasNumber())
+					{
+						int num = grid.getNumber();
+						switch(num)
+						{
+							case 1:flagIcon = new ImageIcon("1.png");
+							case 2:flagIcon = new ImageIcon("2.png");
+							case 3:flagIcon = new ImageIcon("3.png");
+							case 4:flagIcon = new ImageIcon("4.png");
+							case 5:flagIcon = new ImageIcon("5.png");
+							case 6:flagIcon = new ImageIcon("6.png");
+							case 7:flagIcon = new ImageIcon("7.png");
+							case 8:flagIcon = new ImageIcon("8.png");
+						}
+					}
+					if(grid[width][height] == -1)
+					{
+						JOptionPane.showMessageDialog(this,"Game Over!","",JOptionPane.INFORMATION_MESSAGE);
+						board.resetBoard();
+					}
+					if(isWinner())
+					{
+						JOptionPane.showMessageDialog(this, "YOU WIN! Starting New Game", "CONGRATULATIONS", JOptionPane.INFORMATION_MESSAGE);
+						board.resetBoard();
+					}
+				}
+				else if(e.getButton() == MouseEvent.BUTTON3) 
+				{
+					if(flagsAvailable())
+					{
+						if(!grid[width][height].hasFlag())
+						{
+							grid[width][height].setFlag(true);
+							ImageIcon flagIcon = new ImageIcon("flag.png");
+						}
+						else 
+						{
+							 
+								board[width][height].setFlag(false);
+						}	
+					}
+				}
+				updateMineNum();
+			}
+		});
+		
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         pack();
         setVisible(true);
@@ -62,15 +164,10 @@ public class BoardUI extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         // creates a new board class and reset the timer and bomb label
         if(e.getSource() == startNew){
-            if(isGameStarted){
-                timer.stop();
-                timeLabel.setText("0");
-            }
             board = new Board();
             mineLabel.setText(Integer.toString(board.returnBombCount()));
-            timer = new Timer(1000, taskPerformer);
+            timer = new Timer(1000, timerActionListener);
             timer.start();
-            isGameStarted = true;
         }
         //resets the game by calling the board resetBoard class. Resets the timer label and bomb label
         if(e.getSource() == resetGame){
@@ -78,7 +175,7 @@ public class BoardUI extends JFrame implements ActionListener {
             board.resetBoard();
             mineLabel.setText(Integer.toString(board.returnBombCount()));
             timeLabel.setText("0");
-            timer = new Timer(1000, taskPerformer);
+            timer = new Timer(1000, timerActionListener);
             timer.start();
         }
         // calls the save game function
@@ -93,12 +190,12 @@ public class BoardUI extends JFrame implements ActionListener {
             // that represent the loaded game. One way to due this is to create a contructor in the board class that 
             // takes in a 2d array of locations as a parameter. Then set all the private attributes 
             // of the board based on the 2d array passed in.
-            timer = new Timer(1000, taskPerformer);
+            timer = new Timer(1000, timerActionListener);
             timer.start();
         }
     }
     // controls the timer, increments the time by one every time this action listner fires
-    ActionListener taskPerformer = new ActionListener(){
+    ActionListener timerActionListener = new ActionListener(){
         public void actionPerformed(ActionEvent evt) {
             int count = Integer.parseInt(timeLabel.getText());
             count++;
@@ -145,9 +242,50 @@ public class BoardUI extends JFrame implements ActionListener {
         }
         catch(IOException e) { System.out.println("Unable to write!!");}
     }
+	
+//keeps track of number of flags	
+private int numFlags() 
+	{
+		int count = 0;
+		for(int i = 0; i < width; i++) 
+		{
+			for(int j = 0; j < height; j++) 
+			{
+				if(grid[i][j].hasFlag())
+					count++;
+			}
+		}
+		return count;
+	}
+	private void updateMineNum() 
+	{
+		int count = board.determineBombCount - numFlags();
+		mineLabel.setText(String.valueOf(count));			
+	}
+	private boolean flagsAvailable() 
+	{
+		if((board.determineBombCount - numFlags()) > 0)
+			return true;
+		else 
+			return false;
+	}
+	
+public static void main(String[] args)
+	{
+		BoardUI window;
+		if(args.length == 2)
+		{
+			window = new BoardUI(Integer.parseInt(args[0]),Integer.parseInt(args[1]));
+		}
+		else
+			window = new BoardUI(8,8);
+		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+
+
     //loads the game by reading the contents of the file into a 2-d array of locations
     public Location[][] loadGame(){
-        int rows, cols;
+        int width, height;
         Location[][] boardArray;
         //linked list used to store the contents of the locatoin array
         LinkedList list = new LinkedList();
@@ -155,18 +293,18 @@ public class BoardUI extends JFrame implements ActionListener {
             Scanner reader = new Scanner(new File("Saved_Game.txt"));
             //reads in the static game information and assigns the lable accordingly 
             timeLabel.setText(String.valueOf(reader.nextInt()));
-            rows = reader.nextInt();
-            cols = reader.nextInt();
+            width = reader.nextInt();
+            height = reader.nextInt();
             mineLabel.setText(String.valueOf(reader.nextInt()));
-            boardArray = new Location[rows][cols];
+            boardArray = new Location[width][height];
             //reads the content of the location array into a linked list
             while(reader.hasNext()){
                 list.add(reader.next());
             }
             reader.close();
             // loops through the 2d array of locations
-            for(int i = 0; i < rows; i++){
-                for (int j = 0; j < cols; j++){
+            for(int i = 0; i < width; i++){
+                for (int j = 0; j < height; j++){
                     // if the item in the linked list is a b, then create a new instance of location and set it represent a bomb
                     // and remove the item form the list
                     if (list.peek().toString().equals("b")){
@@ -197,12 +335,5 @@ public class BoardUI extends JFrame implements ActionListener {
             return new Location[0][0];
         }
     }
-    
-    public static void main(String[] args) {
-      BoardUI boardtest = new BoardUI();
-      boardtest.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      boardtest.setTitle("MineSweeper BoardUI Test");
-      boardtest.pack();
-      boardtest.setVisible(true);
-    }
+        
 }

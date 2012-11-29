@@ -28,6 +28,7 @@ public class BoardUI extends JFrame implements ActionListener{
     public BoardUI(int width, int height){
 		this.width = width;
 		this.height = height;
+		collapse = new Cascade();
 
 		// creates the frame and ads the componets to the frame
         setLayout(new BorderLayout());
@@ -101,7 +102,7 @@ public class BoardUI extends JFrame implements ActionListener{
 							}
 							if(e.getButton() == MouseEvent.BUTTON1) 
 							{ 
-								if(grid[width][height].hasNumber())
+								if(board.returnNumber(width, height) != 0)
 								{
 									int num = board.returnNumber(width, height);
 									switch(num)
@@ -115,18 +116,24 @@ public class BoardUI extends JFrame implements ActionListener{
 										case 7:flagIcon = new ImageIcon("7.png");
 										case 8:flagIcon = new ImageIcon("8.png");
 									}
-									
+								}
+								
+								else if (board.returnNumber(width, height) == 0)
+								{
 									// After the number is shown cascade the surrounding numbers
 									collapse.cascade(width,height);
 								}
-								if(!board.determineWinner())
-								{
-									JOptionPane.showMessageDialog(null,"Game Over!","",JOptionPane.INFORMATION_MESSAGE);
-									board.resetBoard();
-								}
+								
 								if(board.determineWinner())
 								{
 									JOptionPane.showMessageDialog(null, "CONGRATULATIONS!", "You have won the game! Starting a new game now.", JOptionPane.INFORMATION_MESSAGE);
+									board.resetBoard();
+									
+								}
+								
+								else
+								{
+									JOptionPane.showMessageDialog(null,"Game Over!","",JOptionPane.INFORMATION_MESSAGE);
 									board.resetBoard();
 								}
 							}
@@ -139,9 +146,9 @@ public class BoardUI extends JFrame implements ActionListener{
 										board.setFlag(width, height, true);
 										ImageIcon flagIcon = new ImageIcon("flag.png");
 									}
+									
 									else 
 									{
-										 
 											board.setFlag(width, height, false);
 									}	
 								}

@@ -202,17 +202,33 @@ public class Board {
   //each Location object has it's number replaced with -1
   //if it has been flipped.
   public boolean determineWinner() {
+    //Count the number of flags
+    int flagCount = 0;
     for(int i = 0; i < this.width; i++) {
       for(int j = 0; j < this.height; j++) {
-	if(board[i][j].hasBomb() != true) {
-	  if(board[i][j].getNumber() != -1) {
-	    //This will go through each Location in the
-	    //Board, and if at any point the Location
-	    //both does NOT have a bomb and does NOT
-	    //return -1 (for uncovered), then break
-	    //execution and return false that the
-	    //game has not been won yet.
-	    return false;
+	if(board[i][j].hasFlag() == true) {
+	  flagCount++;
+	}
+      }
+    }
+    
+    if(flagCount < bombCount) {
+      return false;
+    }
+    
+    else if(flagCount == bombCount) {
+      for(int i = 0; i < this.width; i++) {
+	for(int j = 0; j < this.height; j++) {
+	  if(board[i][j].hasBomb() != true) {
+	    if(board[i][j].getNumber() != -1) {
+	      //This will go through each Location in the
+	      //Board, and if at any point the Location
+	      //both does NOT have a bomb and does NOT
+	      //return -1 (for uncovered), then break
+	      //execution and return false that the
+	      //game has not been won yet.
+	      return false;
+	    }
 	  }
 	}
       }
@@ -494,16 +510,6 @@ public class Board {
     System.out.println("==Testing Winner=====================");
     System.out.println("======Before:");
     System.out.println(twoTest.toString());
-    Cascade temp = new Cascade(twoTest);
-    int value = -1; int x = 0; int y = 0;
-    for(int i = 0; i < twoTest.returnWidth() && value != 0; i++) {
-      for(int j = 0; j < twoTest.returnHeight() && value != 0; j++) {
-	value = twoTest.returnNumber(i, j);
-	x = i;
-	y = j;
-      }
-    }
-    temp.cascade(x, y);
     System.out.println("======After:");
     System.out.println(twoTest.toString());
     boolean test = twoTest.determineWinner();
@@ -513,6 +519,9 @@ public class Board {
     for(int i = 0; i < twoTest.returnWidth(); i++) {
       for(int j = 0; j < twoTest.returnHeight(); j++) {
 	twoTest.setNumber(i, j, -1);
+	if(twoTest.returnBomb(i, j)) {
+	  twoTest.setFlag(i, j, true);
+	}
       }
     }
     System.out.println(twoTest.toString());

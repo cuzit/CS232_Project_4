@@ -221,7 +221,7 @@ public class Board {
       }
     }
     
-    this.bombCount = determineBombCount();
+	this.bombCount = returnBombCount();
     placeBombs();
     
     for(int i = 0; i < width; i++) {

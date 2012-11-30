@@ -100,38 +100,35 @@ public class BoardUI extends JFrame implements ActionListener
 								started = true;
 							}
 
-							for(int i = 0;i < board.returnWidth(); i++) 
+							if(e.getButton() == MouseEvent.BUTTON1) 
 							{
-								for(int j = 0; j < board.returnHeight(); j++) 
+								for(int i = 0;i < board.returnWidth(); i++) 
 								{
-									if(e.getSource().equals(grid[i][j]))
+									for(int j = 0; j < board.returnHeight(); j++) 
 									{
-										x = i;
-										y = j;
-									}
+										if(e.getSource().equals(grid[i][j]))
+										{
+											x = i;
+											y = j;
+										}
+									}	
 								}
 								
-							}
-							if(e.getButton() == MouseEvent.BUTTON1) 
-							{ 
 								if (board.returnBomb(x, y))
 								{
-									clock.stop();
-									timeLabel.setText("0");
-									started = false;
+									if (started)
+									{
+										clock.stop();
+									}
+									
+									buttons[x][y].setBackground(Color.white);
 									icon = new ImageIcon("mine.png");
 									buttons[x][y].setIcon(icon);
 									JOptionPane.showMessageDialog(null,"Game Over!","",JOptionPane.INFORMATION_MESSAGE);
 									board.resetBoard();
-									for (int i = 0; i < board.returnWidth(); i++)
-									{
-										for(int j = 0; j < board.returnHeight(); j++)
-										{
-											buttons[i][j].setText("");
-											buttons[i][j].setIcon(null);
-											buttons[i][j].setBackground(null);
-										}
-									}
+									timeLabel.setText("0");
+									started = false;
+									resetButtons();
 								}
 								
 								else if(board.returnNumber(x, y) != 0)
@@ -178,7 +175,7 @@ public class BoardUI extends JFrame implements ActionListener
 										
 										if(board.determineWinner())
 										{
-											JOptionPane.showMessageDialog(null, "CONGRATULATIONS!", "You have won the game! Starting a new game now.", JOptionPane.INFORMATION_MESSAGE);
+											JOptionPane.showMessageDialog(null, "You have won the game! Starting a new game now.", "CONGRATULATIONS!", JOptionPane.INFORMATION_MESSAGE);
 											board.resetBoard();
 										}
 									}
@@ -194,6 +191,18 @@ public class BoardUI extends JFrame implements ActionListener
 							
 							else if(e.getButton() == MouseEvent.BUTTON3) 
 							{
+								for (int i = 0; i < board.returnWidth(); i++)
+								{
+									for (int j = 0; j < board.returnHeight(); j++)
+									{
+										if (e.getSource() == buttons[i][j])
+										{
+											x = i;
+											y = j;
+										}
+									}
+								}
+								
 								if(flagsAvailable())
 								{
 									if(!board.returnFlag(x, y))
@@ -207,7 +216,8 @@ public class BoardUI extends JFrame implements ActionListener
 									{
 										board.setFlag(x, y, false);
 										buttons[x][y].setIcon(null);
-									}	
+									}
+									updateMineNum();
 								}
 								
 								else
@@ -216,7 +226,7 @@ public class BoardUI extends JFrame implements ActionListener
 									buttons[x][y].setIcon(null);
 								}
 							}
-							updateMineNum();
+							
 						}
 					});
 				}
@@ -237,18 +247,23 @@ public class BoardUI extends JFrame implements ActionListener
         // creates a new board class and reset the timer and bomb label
         if(e.getSource() == startNew){
             board = new Board();
-            mineLabel.setText(Integer.toString(board.returnBombCount()));
+			resetButtons();
+            mineLabel.setText(Integer.toString(board.determineBombCount()));
             timer = new Timer(1000, timerActionListener);
-            timer.start();
         }
         //resets the game by calling the board resetBoard class. Resets the timer label and bomb label
         if(e.getSource() == resetGame){
-            timer.stop();
+			started = false;
+            if (started)
+			{
+				timer.stop();
+			}
+			
             board.resetBoard();
+			resetButtons();
             mineLabel.setText(Integer.toString(board.returnBombCount()));
             timeLabel.setText("0");
             timer = new Timer(1000, timerActionListener);
-            timer.start();
         }
         // calls the save game function
         if(e.getSource() == saveGame){
@@ -331,11 +346,11 @@ public class BoardUI extends JFrame implements ActionListener
 	private int numFlags() 
 	{
 		int count = 0;
-		for(int i = 0; i < width; i++) 
+		for(int i = 0; i < board.returnWidth(); i++) 
 		{
-			for(int j = 0; j < height; j++) 
+			for(int j = 0; j < board.returnHeight(); j++) 
 			{
-				if(board.returnFlag(x, y))
+				if(board.returnFlag(i, j))
 				{
 					count++;
 				}
@@ -346,16 +361,29 @@ public class BoardUI extends JFrame implements ActionListener
 	
 	private void updateMineNum() 
 	{
-		int count = board.determineBombCount() - numFlags();
+		int count = board.returnBombCount() - numFlags();
 		mineLabel.setText(String.valueOf(count));
 		
 	}
 	private boolean flagsAvailable() 
 	{
-		if((board.determineBombCount() - numFlags()) > 0)
+		if((board.returnBombCount() - numFlags()) > 0)
 			return true;
 		else 
 			return false;
+	}
+	
+	public void resetButtons()
+	{
+		for (int i = 0; i < board.returnWidth(); i++)
+		{
+			for (int j = 0; j < board.returnHeight(); j++)
+			{
+				buttons[i][j].setBackground(null);
+				buttons[i][j].setIcon(null);
+				buttons[i][j].setText("");
+			}
+		}
 	}
 	
 	public static void main(String[] args)
@@ -363,7 +391,10 @@ public class BoardUI extends JFrame implements ActionListener
 		BoardUI window;
 		if(args.length == 2)
 		{
-			window = new BoardUI(Integer.parseInt(args[0]),Integer.parseInt(args[1]));
+			int width = Integer.parseInt(args[0]);
+			int height = Integer.parseInt(args[1]);
+			
+			window = new BoardUI(width, height);
 		}
 		else
 			window = new BoardUI(8,8);
@@ -452,7 +483,7 @@ public class BoardUI extends JFrame implements ActionListener
 							//endlessly because of the recursion. Besides,
 							//after a Location is cleared from the Board,
 							//the number it stores is permanently irrelevant.
-							//buttons[x][y].setText(String.valueOf(0));
+
 							buttons[x][y].setBackground(Color.white);
 							board.setNumber(i, j, -1);
 							

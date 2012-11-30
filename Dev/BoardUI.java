@@ -470,24 +470,33 @@ public class BoardUI extends JFrame implements ActionListener
 					if(j >= 0 && j < board.returnHeight())
 					{
 						if(board.returnNumber(i, j) == 0)
-						{						
-							//Right here should be the code to "pop"
-							//the button and make it dissappear, replacing
-							//it with an image for the number or whatever
-							
-							//Changing the number stored in a Location
-							//should ONLY be done in the Cascade function
-							//and NOWHERE else, as it could break things.
-							//It is safe to do here because it keeps the
-							//cascade function from calling itself
-							//endlessly because of the recursion. Besides,
-							//after a Location is cleared from the Board,
-							//the number it stores is permanently irrelevant.
-
-							buttons[x][y].setBackground(Color.white);
-							board.setNumber(i, j, -1);
-							
-							cascade(i, j);
+						{
+						  //Right here should be the code to "pop"
+						  //the button and make it dissappear, replacing
+						  //it with an image for the number or whatever
+						  
+						  //Changing the number stored in a Location
+						  //should ONLY be done in the Cascade function
+						  //and NOWHERE else, as it could break things.
+						  //It is safe to do here because it keeps the
+						  //cascade function from calling itself
+						  //endlessly because of the recursion. Besides,
+						  //after a Location is cleared from the Board,
+						  //the number it stores is permanently irrelevant.
+						  board.setNumber(i, j, -1);
+						  buttons[i][j].setBackground(Color.white);
+						  cascade(i, j);
+						}
+					
+						if(board.returnNumber(i, j) != -1)
+						{
+							if(board.returnBomb(i, j) == false)
+							{
+								//Pop it
+								buttons[i][j].setBackground(Color.white);
+								buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+								board.setNumber(i, j, -2);
+							}
 						}
 					}
 				}

@@ -230,6 +230,8 @@ public class BoardUI extends JFrame implements ActionListener
 		started = false;
 		
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setPreferredSize(new Dimension(800, 600));
+		setTitle("Minesweeper");
         pack();
         setVisible(true);
     }   
@@ -240,9 +242,12 @@ public class BoardUI extends JFrame implements ActionListener
         // creates a new board class and reset the timer and bomb label
         if(e.getSource() == startNew){
             board = new Board();
+			this.dispose();
+			new BoardUI(board.returnWidth(), board.returnHeight());
 			if (started)
 			{
 				clock.stop();
+				started = false;
 			}
 			
 			resetButtons();
@@ -253,10 +258,11 @@ public class BoardUI extends JFrame implements ActionListener
         //resets the game by calling the board resetBoard class. Resets the timer label and bomb label
         if(e.getSource() == resetGame)
 		{
-			started = false;
+			
             if (started)
 			{
-				timer.stop();
+				clock.stop();
+				started = false;
 			}
 			
             board.resetBoard();

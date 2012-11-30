@@ -100,6 +100,21 @@ public class Board {
     }
   }
   
+  //Constructor called when loading a game
+  public Board(Location[][] loadArray) {
+    this.width = loadArray.length;
+    this.height = loadArray[0].length;
+    this.board = loadArray;
+    this.bombCount = 0;
+    for(int i = 0; i < width; i++) {
+      for(int j = 0; j < height; j++) {
+	if(board[i][j].hasBomb() == true) {
+	  bombCount++;
+	}
+      }
+    }
+  }
+  
   /**********
   *Functions*
   ***********/
@@ -221,7 +236,7 @@ public class Board {
       }
     }
     
-	this.bombCount = returnBombCount();
+    this.bombCount = returnBombCount();
     placeBombs();
     
     for(int i = 0; i < width; i++) {
@@ -504,5 +519,13 @@ public class Board {
     test = twoTest.determineWinner();
     if(test) { System.out.println("The game is won!"); }
     else { System.out.println("The game has not been won."); }
+    
+    System.out.println("==Testing Loading===================");
+    Board save = new Board(10, 10, 30);
+    System.out.println("Saving this board:");
+    System.out.println(save.toString());
+    System.out.println("Loading this board:");
+    Board load = new Board(save.board);
+    System.out.println(load.toString());
   }
 }

@@ -106,8 +106,8 @@ public class BoardUI extends JFrame implements ActionListener
 								{
 									if(e.getSource().equals(grid[i][j]))
 									{
-										x = i;
-										y = j;
+										this.x = i;
+										this.y = j;
 									}
 								}
 								

@@ -99,16 +99,15 @@ public class BoardUI extends JFrame implements ActionListener
 								clock.start();
 								started = true;
 							}
-							int width = 0;
-							int height = 0;
-							for(int i = 0;i < width;i++) 
+
+							for(int i = 0;i < board.returnWidth(); i++) 
 							{
-								for(int j = 0; j < height; j++) 
+								for(int j = 0; j < board.returnHeight(); j++) 
 								{
 									if(e.getSource().equals(grid[i][j]))
 									{
-										width = i;
-										height = j;
+										x = i;
+										y = j;
 									}
 								}
 								
@@ -197,12 +196,14 @@ public class BoardUI extends JFrame implements ActionListener
 									else 
 									{
 										board.setFlag(x, y, false);
+										buttons[x][y].setIcon(null);
 									}	
 								}
 								
 								else
 								{
 									board.setFlag(x, y, false);
+									buttons[x][y].setIcon(null);
 								}
 							}
 							updateMineNum();

@@ -137,35 +137,27 @@ public class BoardUI extends JFrame implements ActionListener
 									switch(num)
 									{
 										case 1:
-											icon = new ImageIcon("1.png");
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
 											buttons[x][y].setBackground(Color.white);
 										case 2:
-											icon = new ImageIcon("2.png");
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
 											buttons[x][y].setBackground(Color.white);
 										case 3:
-											icon = new ImageIcon("3.png");
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
 											buttons[x][y].setBackground(Color.white);
 										case 4:
-											icon = new ImageIcon("4.png");
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
 											buttons[x][y].setBackground(Color.white);
 										case 5:
-											icon = new ImageIcon("5.png");
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
 											buttons[x][y].setBackground(Color.white);
 										case 6:
-											icon = new ImageIcon("6.png");
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
 											buttons[x][y].setBackground(Color.white);
 										case 7:
-											icon = new ImageIcon("7.png");
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
 											buttons[x][y].setBackground(Color.white);
 										case 8:
-											icon = new ImageIcon("8.png");
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
 											buttons[x][y].setBackground(Color.white);
 										default: 
@@ -243,16 +235,24 @@ public class BoardUI extends JFrame implements ActionListener
     }   
 
     //checks to see which menu item was clicked
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent e)
+	{
         // creates a new board class and reset the timer and bomb label
         if(e.getSource() == startNew){
             board = new Board();
+			if (started)
+			{
+				clock.stop();
+			}
+			
 			resetButtons();
             mineLabel.setText(Integer.toString(board.determineBombCount()));
+			timeLabel.setText("0");
             timer = new Timer(1000, timerActionListener);
         }
         //resets the game by calling the board resetBoard class. Resets the timer label and bomb label
-        if(e.getSource() == resetGame){
+        if(e.getSource() == resetGame)
+		{
 			started = false;
             if (started)
 			{
@@ -265,12 +265,15 @@ public class BoardUI extends JFrame implements ActionListener
             timeLabel.setText("0");
             timer = new Timer(1000, timerActionListener);
         }
-        // calls the save game function
-        if(e.getSource() == saveGame){
+        
+		// Calls the save game function
+        if(e.getSource() == saveGame)
+		{
             saveGame();
         }
         // class the load game function and starts the timer 
-        if(e.getSource() == loadGame){
+        if(e.getSource() == loadGame)
+		{
             Location[][] boardArray = loadGame();
             //set board class with this location array
             // to load a game we need to be able to pass the board class a 2d array of locations 
@@ -294,20 +297,25 @@ public class BoardUI extends JFrame implements ActionListener
 		}
     }
     // controls the timer, increments the time by one every time this action listner fires
-    ActionListener timerActionListener = new ActionListener(){
-        public void actionPerformed(ActionEvent evt) {
+    ActionListener timerActionListener = new ActionListener()
+	{
+        public void actionPerformed(ActionEvent evt)
+		{
             int count = Integer.parseInt(timeLabel.getText());
             count++;
             timeLabel.setText(Integer.toString(count));
         }
     };
     //saves the game by wrting the current state of the board class' locaction array to a text file
-    public void saveGame(){
-        try{
+    public void saveGame()
+	{
+        try
+		{
             FileWriter fstream = new FileWriter("Saved_Game.txt");
             BufferedWriter out = new BufferedWriter(fstream);
-            // writes static game information to file. 
-            //Includes: time, width of the board, heigth of the board, and bomb count
+            
+			//	Writes static game information to file. 
+            //	Includes: time, width of the board, heigth of the board, and bomb count
             out.write(timeLabel.getText() + " ");
             out.write("\n");
             out.write(String.valueOf(board.returnHeight()) + " ");
@@ -316,21 +324,27 @@ public class BoardUI extends JFrame implements ActionListener
             out.write("\n");
             out.write(String.valueOf(board.returnBombCount()) + " ");
             out.write("\n");
+			
             // loops throgth the board class' locaction array
-            for(int i = 0; i < board.returnHeight(); i++){
-                for(int j = 0; j < board.returnWidth(); j++){
+            for(int i = 0; i < board.returnHeight(); i++)
+			{
+                for(int j = 0; j < board.returnWidth(); j++)
+				{
                     // if at the current index,  if the location represents a bomb. Write b to the file
-                    if(board.returnBomb(i, j)){
+                    if(board.returnBomb(i, j))
+					{
                         out.write("b");
                         out.write("\n");
                     }
                     // if at the current index, if the location represents a flag. Write f to the file
-                    else if(board.returnFlag(i, j)){
+                    else if(board.returnFlag(i, j))
+					{
                         out.write("f");
                         out.write("\n");
                     }
                     //If at the current index, if the locaitn is not a flag nor bomb. Write the number of the location to the file
-                    else{
+                    else
+					{
                         out.write(Integer.toString(board.returnNumber(i, j)));
                         out.write("\n");
                     }
@@ -342,7 +356,7 @@ public class BoardUI extends JFrame implements ActionListener
         catch(IOException e) { System.out.println("Unable to write!!");}
     }
 	
-	//keeps track of number of flags	
+	// Keeps track of number of flags	
 	private int numFlags() 
 	{
 		int count = 0;
@@ -363,8 +377,8 @@ public class BoardUI extends JFrame implements ActionListener
 	{
 		int count = board.returnBombCount() - numFlags();
 		mineLabel.setText(String.valueOf(count));
-		
 	}
+	
 	private boolean flagsAvailable() 
 	{
 		if((board.returnBombCount() - numFlags()) > 0)
@@ -403,44 +417,56 @@ public class BoardUI extends JFrame implements ActionListener
 
 
     //loads the game by reading the contents of the file into a 2-d array of locations
-    public Location[][] loadGame(){
+    public Location[][] loadGame()
+	{
         int width, height;
         Location[][] boardArray;
-        //linked list used to store the contents of the locatoin array
+        
+		// This linked list is used to store the contents of the location array
         LinkedList list = new LinkedList();
-        try{
+        try
+		{
             Scanner reader = new Scanner(new File("Saved_Game.txt"));
-            //reads in the static game information and assigns the lable accordingly 
+            
+			//	Read in the static game information and assigns to the grid accordingly 
             timeLabel.setText(String.valueOf(reader.nextInt()));
             width = reader.nextInt();
             height = reader.nextInt();
             mineLabel.setText(String.valueOf(reader.nextInt()));
             boardArray = new Location[width][height];
-            //reads the content of the location array into a linked list
-            while(reader.hasNext()){
+            
+			// Read the content of the location array into the linked list
+            while(reader.hasNext())
+			{
                 list.add(reader.next());
             }
+			
             reader.close();
             // loops through the 2d array of locations
-            for(int i = 0; i < width; i++){
-                for (int j = 0; j < height; j++){
+            for(int i = 0; i < width; i++)
+			{
+                for (int j = 0; j < height; j++)
+				{
                     // if the item in the linked list is a b, then create a new instance of location and set it represent a bomb
                     // and remove the item form the list
-                    if (list.peek().toString().equals("b")){
+                    if (list.peek().toString().equals("b"))
+					{
                         boardArray[i][j] = new Location();
                         boardArray[i][j].setBomb(true);
                         list.remove();
                     }
                     // if the item in the linked list is a f, then create a new instance of location and set it represent a flag
                     // and remove the item form the list
-                    else if(list.peek().toString().equals("f")){
+                    else if(list.peek().toString().equals("f"))
+					{
                         boardArray[i][j] = new Location();
                         boardArray[i][j].setFlag(true);
                         list.remove();
                     }
                     // if the item in the linked list is not a b nor f, then create a new instance of location and set its number to what is in the list
                     // and remove the item form the list
-                    else{
+                    else
+					{
                         boardArray[i][j] = new Location();
                         boardArray[i][j].setNumber(new Integer(list.remove().toString()));
                     }
@@ -449,7 +475,8 @@ public class BoardUI extends JFrame implements ActionListener
             return boardArray;
             
         }
-        catch(FileNotFoundException e){
+        catch(FileNotFoundException e)
+		{
             System.out.println(e.toString());
             return new Location[0][0];
         }
@@ -457,10 +484,13 @@ public class BoardUI extends JFrame implements ActionListener
 	
 	public void cascade(int x, int y)
 	{
-		//This code structure comes almost directly from the
-		//determineNumberofNearbyMines function from the
-		//Board class. If you need to see the logic of how
-		//this works, look for the comments there.
+		/*
+		*	This code structure comes almost directly from the
+		*	determineNumberofNearbyMines function from the
+		*	Board class. If you need to see the logic of how
+		*	this works, look for the comments there.
+		*/
+		
 		for(int i = (x - 1); i < (x + 2); i++)
 		{
 			if(i >= 0 && i < board.returnWidth())
@@ -471,21 +501,26 @@ public class BoardUI extends JFrame implements ActionListener
 					{
 						if(board.returnNumber(i, j) == 0)
 						{
-						  //Right here should be the code to "pop"
-						  //the button and make it dissappear, replacing
-						  //it with an image for the number or whatever
 						  
-						  //Changing the number stored in a Location
-						  //should ONLY be done in the Cascade function
-						  //and NOWHERE else, as it could break things.
-						  //It is safe to do here because it keeps the
-						  //cascade function from calling itself
-						  //endlessly because of the recursion. Besides,
-						  //after a Location is cleared from the Board,
-						  //the number it stores is permanently irrelevant.
-						  board.setNumber(i, j, -1);
-						  buttons[i][j].setBackground(Color.white);
-						  cascade(i, j);
+						  
+						/*
+						*	Right here should be the code to "pop"
+						*  	the button and make it dissappear, replacing
+						*	it with an image for the number or whatever
+						*
+						*
+						*	Changing the number stored in a Location
+						*	should ONLY be done in the Cascade function
+						*	and NOWHERE else, as it could break things.
+						*	It is safe to do here because it keeps the
+						*	cascade function from calling itself
+						*	endlessly because of the recursion. Besides,
+						*	after a Location is cleared from the Board,
+						*	the number it stores is permanently irrelevant.
+						*/
+							  buttons[i][j].setBackground(Color.white);
+							  board.setNumber(i, j, -1);
+							  cascade(i, j);
 						}
 					
 						if(board.returnNumber(i, j) != -1)
@@ -494,8 +529,8 @@ public class BoardUI extends JFrame implements ActionListener
 							{
 								//Pop it
 								buttons[i][j].setBackground(Color.white);
-								buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
-								board.setNumber(i, j, -2);
+								buttons[i][j].setText(String.valueOf(board.returnNumber(i, j)));
+								board.setNumber(i, j, -1);
 							}
 						}
 					}

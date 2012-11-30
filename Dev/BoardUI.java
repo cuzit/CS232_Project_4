@@ -292,21 +292,32 @@ public class BoardUI extends JFrame implements ActionListener
         
 		// Calls the save game function
         if(e.getSource() == saveGame)
-		{
+	{
             saveGame();
         }
         // class the load game function and starts the timer 
         if(e.getSource() == loadGame)
-		{
+	{
             Location[][] boardArray = loadGame();
-            //set board class with this location array
-            // to load a game we need to be able to pass the board class a 2d array of locations 
-            // that represent the loaded game. One way to due this is to create a contructor in the board class that 
-            // takes in a 2d array of locations as a parameter. Then set all the private attributes 
-            // of the board based on the 2d array passed in.
             board = new Board(boardArray);
             timer = new Timer(1000, timerActionListener);
             timer.start();
+            
+            resetButtons();
+            for(int i = 0; i < width; i++) {
+	      for(int j = 0; j < height; j++) {
+		if(board.returnFlipped(i, j) == true) {
+		  int num = board.returnNumber(i, j);
+		  buttons[i][j].setText(String.valueOf(board.returnNumber(i, j)));
+		  buttons[i][j].setBackground(Color.white);
+		}
+		
+		else if(board.returnFlag(i, j) == true) {
+		  icon = new ImageIcon("flag.png");
+		  buttons[i][j].setIcon(icon);
+		}
+	      }
+            }
         }
 		
 		for (int i = 0; i < width; i++)
@@ -372,10 +383,21 @@ public class BoardUI extends JFrame implements ActionListener
 					{
                         out.write(Integer.toString(board.returnNumber(i, j)));
                         out.write("\n");
+                        //If the tile has been flipped by the player, write
+                        //the next line has an 'r'. If it has not been
+                        //flipped, write the next line as an 'u.'
+                        if(board.returnFlipped(i, j) == true) {
+			  out.write("r\n");
+                        }
+                        else {
+			  out.write("u\n");
+                        }
                     }
                 }
             }
             out.close();
+            
+            JOptionPane.showMessageDialog(null, "Your game has been saved.", "Game Saved", JOptionPane.INFORMATION_MESSAGE);
             
         }
         catch(IOException e) { System.out.println("Unable to write!!");}
@@ -507,9 +529,23 @@ public class BoardUI extends JFrame implements ActionListener
 					{
                         boardArray[i][j] = new Location();
                         boardArray[i][j].setNumber(new Integer(list.remove().toString()));
+                        //Determine whether the tile is flipped or not
+                        if(list.peek().toString().equals("r")) {
+			  boardArray[i][j].setFlipped(true);
+			  list.remove();
+                        }
+                        else if(list.peek().toString().equals("u")) {
+			  boardArray[i][j].setFlipped(false);
+			  list.remove();
+                        }
+                        else {
+			  JOptionPane.showMessageDialog(null, "An unknown error has occurred. Please try again.", "Error", JOptionPane.INFORMATION_MESSAGE);
+                        }
                     }
                 }
             }
+            JOptionPane.showMessageDialog(null, "Successfully loaded previously saved game.", "Load Game", JOptionPane.INFORMATION_MESSAGE);
+            
             return boardArray;
             
         }

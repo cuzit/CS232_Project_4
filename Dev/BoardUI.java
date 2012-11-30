@@ -91,7 +91,7 @@ public class BoardUI extends JFrame implements ActionListener
 					buttons[i][j].addMouseListener(new MouseAdapter()
 					{
 						//mouse
-						public void mousePressed (MouseEvent e) 
+						public void mouseClicked (MouseEvent e) 
 						{	
 							if(!started)
 							{
@@ -118,6 +118,14 @@ public class BoardUI extends JFrame implements ActionListener
 								{
 									JOptionPane.showMessageDialog(null,"Game Over!","",JOptionPane.INFORMATION_MESSAGE);
 									board.resetBoard();
+									for (int i = 0; i < board.returnWidth(); i++)
+									{
+										for(int j = 0; j < board.returnHeight(); j++)
+										{
+											buttons[i][j].setText("");
+											buttons[i][j].setIcon(null);
+										}
+									}
 								}
 								
 								else if(board.returnNumber(x, y) != 0)
@@ -127,45 +135,32 @@ public class BoardUI extends JFrame implements ActionListener
 									{
 										case 1:
 											icon = new ImageIcon("1.png");
-											//font = new Font(buttons[1][1].getFont().getFontName(), 2, buttons[1][1].getFont().getSize());
-											//buttons[x][y].setFont(font);
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
 										case 2:
 											icon = new ImageIcon("2.png");
-											//font = new Font(buttons[1][1].getFont().getFontName(), 2, buttons[1][1].getFont().getSize());
-											//buttons[x][y].setFont(font);
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
 										case 3:
 											icon = new ImageIcon("3.png");
-											//font = new Font(buttons[1][1].getFont().getFontName(), 2, buttons[1][1].getFont().getSize());
-											//buttons[x][y].setFont(font);
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
 										case 4:
 											icon = new ImageIcon("4.png");
-											//font = new Font(buttons[1][1].getFont().getFontName(), 2, buttons[1][1].getFont().getSize());
-											//buttons[x][y].setFont(font);
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
 										case 5:
 											icon = new ImageIcon("5.png");
-											//font = new Font(buttons[1][1].getFont().getFontName(), 2, buttons[1][1].getFont().getSize());
-											//buttons[x][y].setFont(font);
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
 										case 6:
 											icon = new ImageIcon("6.png");
-											//font = new Font(buttons[1][1].getFont().getFontName(), 2, buttons[1][1].getFont().getSize());
-											//buttons[x][y].setFont(font);
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
 										case 7:
 											icon = new ImageIcon("7.png");
-											//font = new Font(buttons[1][1].getFont().getFontName(), 2, buttons[1][1].getFont().getSize());
-											//buttons[x][y].setFont(font);
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
 										case 8:
 											icon = new ImageIcon("8.png");
-											//font = new Font(buttons[1][1].getFont().getFontName(), 2, buttons[1][1].getFont().getSize());
-											//buttons[x][y].setFont(font);
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
-											
+										default: 
+											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+										
+										
 										if(board.determineWinner())
 										{
 											JOptionPane.showMessageDialog(null, "CONGRATULATIONS!", "You have won the game! Starting a new game now.", JOptionPane.INFORMATION_MESSAGE);

@@ -116,6 +116,9 @@ public class BoardUI extends JFrame implements ActionListener
 							{ 
 								if (board.returnBomb(x, y))
 								{
+									clock.stop();
+									timeLabel.setText("0");
+									started = false;
 									icon = new ImageIcon("mine.png");
 									buttons[x][y].setIcon(icon);
 									JOptionPane.showMessageDialog(null,"Game Over!","",JOptionPane.INFORMATION_MESSAGE);
@@ -126,6 +129,7 @@ public class BoardUI extends JFrame implements ActionListener
 										{
 											buttons[i][j].setText("");
 											buttons[i][j].setIcon(null);
+											buttons[i][j].setBackground(null);
 										}
 									}
 								}
@@ -138,29 +142,38 @@ public class BoardUI extends JFrame implements ActionListener
 										case 1:
 											icon = new ImageIcon("1.png");
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+											buttons[x][y].setBackground(Color.white);
 										case 2:
 											icon = new ImageIcon("2.png");
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+											buttons[x][y].setBackground(Color.white);
 										case 3:
 											icon = new ImageIcon("3.png");
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+											buttons[x][y].setBackground(Color.white);
 										case 4:
 											icon = new ImageIcon("4.png");
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+											buttons[x][y].setBackground(Color.white);
 										case 5:
 											icon = new ImageIcon("5.png");
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+											buttons[x][y].setBackground(Color.white);
 										case 6:
 											icon = new ImageIcon("6.png");
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+											buttons[x][y].setBackground(Color.white);
 										case 7:
 											icon = new ImageIcon("7.png");
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+											buttons[x][y].setBackground(Color.white);
 										case 8:
 											icon = new ImageIcon("8.png");
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+											buttons[x][y].setBackground(Color.white);
 										default: 
-											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+											//buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+											buttons[x][y].setBackground(Color.white);
 										
 										
 										if(board.determineWinner())
@@ -174,7 +187,7 @@ public class BoardUI extends JFrame implements ActionListener
 								else if (board.returnNumber(x, y) == 0)
 								{
 									// After the number is shown cascade the surrounding numbers
-									buttons[x][y].setText(String.valueOf(board.returnNumber(x, y))); // used for testing purposes only
+									//buttons[x][y].setText(String.valueOf(board.returnNumber(x, y))); // used for testing purposes only
 									cascade(x, y);
 								}
 							}
@@ -439,7 +452,8 @@ public class BoardUI extends JFrame implements ActionListener
 							//endlessly because of the recursion. Besides,
 							//after a Location is cleared from the Board,
 							//the number it stores is permanently irrelevant.
-							buttons[x][y].setText(String.valueOf(0));
+							//buttons[x][y].setText(String.valueOf(0));
+							buttons[x][y].setBackground(Color.white);
 							board.setNumber(i, j, -1);
 							
 							cascade(i, j);

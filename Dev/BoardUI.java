@@ -116,6 +116,8 @@ public class BoardUI extends JFrame implements ActionListener
 							{ 
 								if (board.returnBomb(x, y))
 								{
+									icon = new ImageIcon("mine.png");
+									buttons[x][y].setIcon(icon);
 									JOptionPane.showMessageDialog(null,"Game Over!","",JOptionPane.INFORMATION_MESSAGE);
 									board.resetBoard();
 									for (int i = 0; i < board.returnWidth(); i++)
@@ -437,8 +439,9 @@ public class BoardUI extends JFrame implements ActionListener
 							//endlessly because of the recursion. Besides,
 							//after a Location is cleared from the Board,
 							//the number it stores is permanently irrelevant.
+							buttons[x][y].setText(String.valueOf(0));
 							board.setNumber(i, j, -1);
-					  
+							
 							cascade(i, j);
 						}
 					}

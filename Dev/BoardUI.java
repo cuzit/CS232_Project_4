@@ -1,40 +1,54 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.Font.*;
 import java.io.*;
 import java.util.LinkedList;
 import java.util.Scanner;
 import javax.swing.*;
 
 
-public class BoardUI extends JFrame implements ActionListener{
-
-    private JMenu options = new JMenu("Game");
-    private JMenuItem startNew = new JMenuItem("Start New Game");
-    private JMenuItem resetGame = new JMenuItem("Reset Game");
-    private JMenuItem saveGame = new JMenuItem("Save Game");
-    private JMenuItem loadGame = new JMenuItem("Load Game");
-    private JLabel timeLabel = new JLabel("0");
-    private JLabel mineLabel = new JLabel ("--");
+public class BoardUI extends JFrame implements ActionListener
+{
+    private JMenu options;
+	private JMenuItem startNew;
+    private JMenuItem resetGame;
+    private JMenuItem saveGame;
+    private JMenuItem loadGame;
+    private JLabel timeLabel;
+    private JLabel mineLabel;
+	private JButton[][] buttons;
     private Timer timer;
     private Board board;
 	private Location grid[][];
-	private Cascade collapse;
-	private ImageIcon flagIcon;
+	private Font font;
+	private ImageIcon icon;
 	private Timer clock;
 	private Boolean started;
 	private int width;
 	private int height;
+	private int x;
+	private int y;
     
-    public BoardUI(int width, int height){
+    public BoardUI(int width, int height)
+	{
+		board = new Board(width, height);
+		grid = new Location[width][height];
 		this.width = width;
 		this.height = height;
-		collapse = new Cascade();
 
-		// creates the frame and ads the componets to the frame
+		// Creates the frame and ads the componets to the frame
         setLayout(new BorderLayout());
         JPanel topPanel = new JPanel();
 		JPanel bottomPanel = new JPanel();
         topPanel.setLayout(new BorderLayout());
+		
+		options = new JMenu("Game");
+		startNew = new JMenuItem("Start New Game");
+		resetGame = new JMenuItem("Reset Game");
+		saveGame = new JMenuItem("Save Game");
+		loadGame = new JMenuItem("Load Game");
+		timeLabel = new JLabel("0");
+		mineLabel = new JLabel(String.valueOf(board.returnBombCount()));
         
         JPanel bottom = new JPanel();
 		JPanel layout = new JPanel();
@@ -64,12 +78,11 @@ public class BoardUI extends JFrame implements ActionListener{
         
 		
 		layout.setLayout(new GridLayout(width,height));
-		board = new Board(width, height);
-		grid = new Location[width][height];
-		JButton[][] buttons = new JButton[width][height];
+		
+		buttons = new JButton[width][height];
 		for(int i = 0; i < width; i++)
 			{
-				for( int j = 0; j < height; j++)
+				for(int j = 0; j < height; j++)
 				{
 					buttons[i][j] = new JButton();
 					buttons[i][j].addActionListener(this);
@@ -102,26 +115,58 @@ public class BoardUI extends JFrame implements ActionListener{
 							}
 							if(e.getButton() == MouseEvent.BUTTON1) 
 							{ 
-								if(board.returnNumber(width, height) != 0)
+								if(board.returnNumber(x, y) != 0)
 								{
-									int num = board.returnNumber(width, height);
+									int num = board.returnNumber(x, y);
 									switch(num)
 									{
-										case 1:flagIcon = new ImageIcon("1.png");
-										case 2:flagIcon = new ImageIcon("2.png");
-										case 3:flagIcon = new ImageIcon("3.png");
-										case 4:flagIcon = new ImageIcon("4.png");
-										case 5:flagIcon = new ImageIcon("5.png");
-										case 6:flagIcon = new ImageIcon("6.png");
-										case 7:flagIcon = new ImageIcon("7.png");
-										case 8:flagIcon = new ImageIcon("8.png");
+										case 1:
+											icon = new ImageIcon("1.png");
+											//font = new Font(buttons[1][1].getFont().getFontName(), 2, buttons[1][1].getFont().getSize());
+											//buttons[x][y].setFont(font);
+											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+										case 2:
+											icon = new ImageIcon("2.png");
+											//font = new Font(buttons[1][1].getFont().getFontName(), 2, buttons[1][1].getFont().getSize());
+											//buttons[x][y].setFont(font);
+											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+										case 3:
+											icon = new ImageIcon("3.png");
+											//font = new Font(buttons[1][1].getFont().getFontName(), 2, buttons[1][1].getFont().getSize());
+											//buttons[x][y].setFont(font);
+											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+										case 4:
+											icon = new ImageIcon("4.png");
+											//font = new Font(buttons[1][1].getFont().getFontName(), 2, buttons[1][1].getFont().getSize());
+											//buttons[x][y].setFont(font);
+											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+										case 5:
+											icon = new ImageIcon("5.png");
+											//font = new Font(buttons[1][1].getFont().getFontName(), 2, buttons[1][1].getFont().getSize());
+											//buttons[x][y].setFont(font);
+											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+										case 6:
+											icon = new ImageIcon("6.png");
+											//font = new Font(buttons[1][1].getFont().getFontName(), 2, buttons[1][1].getFont().getSize());
+											//buttons[x][y].setFont(font);
+											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+										case 7:
+											icon = new ImageIcon("7.png");
+											//font = new Font(buttons[1][1].getFont().getFontName(), 2, buttons[1][1].getFont().getSize());
+											//buttons[x][y].setFont(font);
+											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+										case 8:
+											icon = new ImageIcon("8.png");
+											//font = new Font(buttons[1][1].getFont().getFontName(), 2, buttons[1][1].getFont().getSize());
+											//buttons[x][y].setFont(font);
+											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
 									}
 								}
 								
-								else if (board.returnNumber(width, height) == 0)
+								else if (board.returnNumber(x, y) == 0)
 								{
 									// After the number is shown cascade the surrounding numbers
-									collapse.cascade(width,height);
+									cascade(x, y);
 								}
 								
 								if(board.determineWinner())
@@ -137,20 +182,27 @@ public class BoardUI extends JFrame implements ActionListener{
 									board.resetBoard();
 								}
 							}
+							
 							else if(e.getButton() == MouseEvent.BUTTON3) 
 							{
 								if(flagsAvailable())
 								{
-									if(!board.returnFlag(width, height))
+									if(!board.returnFlag(x, y))
 									{
-										board.setFlag(width, height, true);
-										ImageIcon flagIcon = new ImageIcon("flag.png");
+										board.setFlag(x, y, true);
+										icon = new ImageIcon("flag.png");
+										buttons[x][y].setIcon(icon);
 									}
 									
 									else 
 									{
-											board.setFlag(width, height, false);
+										board.setFlag(x, y, false);
 									}	
+								}
+								
+								else
+								{
+									board.setFlag(x, y, false);
 								}
 							}
 							updateMineNum();
@@ -158,9 +210,9 @@ public class BoardUI extends JFrame implements ActionListener{
 					});
 				}
 			}
-		bottomPanel.add(layout);
+			
         add(topPanel, BorderLayout.NORTH);
-		add(bottomPanel, BorderLayout.SOUTH);
+		add(layout, BorderLayout.CENTER);
         
 		started = false;
 		
@@ -202,6 +254,18 @@ public class BoardUI extends JFrame implements ActionListener{
             timer = new Timer(1000, timerActionListener);
             timer.start();
         }
+		
+		for (int i = 0; i < width; i++)
+		{
+			for (int j = 0; j < height; j++)
+			{
+				if (e.getSource() == buttons[i][j])
+				{
+					x = i;
+					y = j;
+				}
+			}
+		}
     }
     // controls the timer, increments the time by one every time this action listner fires
     ActionListener timerActionListener = new ActionListener(){
@@ -252,24 +316,28 @@ public class BoardUI extends JFrame implements ActionListener{
         catch(IOException e) { System.out.println("Unable to write!!");}
     }
 	
-//keeps track of number of flags	
-private int numFlags() 
+	//keeps track of number of flags	
+	private int numFlags() 
 	{
 		int count = 0;
 		for(int i = 0; i < width; i++) 
 		{
 			for(int j = 0; j < height; j++) 
 			{
-				if(grid[i][j].hasFlag())
+				if(board.returnFlag(x, y))
+				{
 					count++;
+				}
 			}
 		}
 		return count;
 	}
+	
 	private void updateMineNum() 
 	{
 		int count = board.determineBombCount() - numFlags();
-		mineLabel.setText(String.valueOf(count));			
+		mineLabel.setText(String.valueOf(count));
+		
 	}
 	private boolean flagsAvailable() 
 	{
@@ -279,7 +347,7 @@ private int numFlags()
 			return false;
 	}
 	
-public static void main(String[] args)
+	public static void main(String[] args)
 	{
 		BoardUI window;
 		if(args.length == 2)
@@ -344,5 +412,43 @@ public static void main(String[] args)
             return new Location[0][0];
         }
     }
+	
+	public void cascade(int x, int y)
+	{
+		//This code structure comes almost directly from the
+		//determineNumberofNearbyMines function from the
+		//Board class. If you need to see the logic of how
+		//this works, look for the comments there.
+		for(int i = (x - 1); i < (x + 2); i++)
+		{
+			if(i >= 0 && i < board.returnWidth())
+			{
+				for(int j = (y - 1); j < (y + 2); j++)
+				{
+					if(j >= 0 && j < board.returnHeight())
+					{
+						if(board.returnNumber(i, j) == 0)
+						{
+							//Right here should be the code to "pop"
+							//the button and make it dissappear, replacing
+							//it with an image for the number or whatever
+						  
+							//Changing the number stored in a Location
+							//should ONLY be done in the Cascade function
+							//and NOWHERE else, as it could break things.
+							//It is safe to do here because it keeps the
+							//cascade function from calling itself
+							//endlessly because of the recursion. Besides,
+							//after a Location is cleared from the Board,
+							//the number it stores is permanently irrelevant.
+							board.setNumber(i, j, -1);
+					  
+							cascade(i, j);
+						}
+					}
+				}
+			}
+		}
+	}
         
 }

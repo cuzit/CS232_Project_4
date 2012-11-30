@@ -106,15 +106,21 @@ public class BoardUI extends JFrame implements ActionListener
 								{
 									if(e.getSource().equals(grid[i][j]))
 									{
-										this.x = i;
-										this.y = j;
+										x = i;
+										y = j;
 									}
 								}
 								
 							}
 							if(e.getButton() == MouseEvent.BUTTON1) 
 							{ 
-								if(board.returnNumber(x, y) != 0)
+								if (board.returnBomb(x, y))
+								{
+									JOptionPane.showMessageDialog(null,"Game Over!","",JOptionPane.INFORMATION_MESSAGE);
+									board.resetBoard();
+								}
+								
+								else if(board.returnNumber(x, y) != 0)
 								{
 									int num = board.returnNumber(x, y);
 									switch(num)
@@ -159,26 +165,20 @@ public class BoardUI extends JFrame implements ActionListener
 											//font = new Font(buttons[1][1].getFont().getFontName(), 2, buttons[1][1].getFont().getSize());
 											//buttons[x][y].setFont(font);
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+											
+										if(board.determineWinner())
+										{
+											JOptionPane.showMessageDialog(null, "CONGRATULATIONS!", "You have won the game! Starting a new game now.", JOptionPane.INFORMATION_MESSAGE);
+											board.resetBoard();
+										}
 									}
 								}
 								
 								else if (board.returnNumber(x, y) == 0)
 								{
 									// After the number is shown cascade the surrounding numbers
+									buttons[x][y].setText(String.valueOf(board.returnNumber(x, y))); // used for testing purposes only
 									cascade(x, y);
-								}
-								
-								if(board.determineWinner())
-								{
-									JOptionPane.showMessageDialog(null, "CONGRATULATIONS!", "You have won the game! Starting a new game now.", JOptionPane.INFORMATION_MESSAGE);
-									board.resetBoard();
-									
-								}
-								
-								else
-								{
-									JOptionPane.showMessageDialog(null,"Game Over!","",JOptionPane.INFORMATION_MESSAGE);
-									board.resetBoard();
 								}
 							}
 							

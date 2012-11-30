@@ -103,7 +103,7 @@ public class BoardUI extends JFrame implements ActionListener
 							int height = 0;
 							for(int i = 0;i < width;i++) 
 							{
-								for(int j = 0;j < height;j++) 
+								for(int j = 0; j < height; j++) 
 								{
 									if(e.getSource().equals(grid[i][j]))
 									{
@@ -428,11 +428,11 @@ public class BoardUI extends JFrame implements ActionListener
 					if(j >= 0 && j < board.returnHeight())
 					{
 						if(board.returnNumber(i, j) == 0)
-						{
+						{						
 							//Right here should be the code to "pop"
 							//the button and make it dissappear, replacing
 							//it with an image for the number or whatever
-						  
+							
 							//Changing the number stored in a Location
 							//should ONLY be done in the Cascade function
 							//and NOWHERE else, as it could break things.
@@ -450,5 +450,4 @@ public class BoardUI extends JFrame implements ActionListener
 			}
 		}
 	}
-        
 }

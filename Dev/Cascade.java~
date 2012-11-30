@@ -47,7 +47,7 @@ public void cascade(int x, int y)
   
   public static void main(String[] args) {
     System.out.println("Running...");
-    Board testBoard = new Board(12, 12, 72);
+    Board testBoard = new Board(12, 12);
     Cascade temp = new Cascade(testBoard);
     System.out.println("==Before:=====================");
     System.out.println(testBoard.toString());

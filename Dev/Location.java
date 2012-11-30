@@ -15,6 +15,7 @@ public class Location
 	boolean flag;
 	boolean bomb;
 	boolean numberBool;
+	boolean flipped;
 	int number;
   
 	//	Constructor
@@ -52,6 +53,10 @@ public class Location
 	  return number;
 	}
 	
+	public Boolean isFlipped() {
+	  return flipped;
+	}
+	
 	// Setters
 	
 	// Returns a boolean so that you know whether not the flag was
@@ -76,6 +81,11 @@ public class Location
 	{
 		this.number = number;
 		return true;
+	}
+	
+	public Boolean setFlipped(boolean flipped) {
+	  this.flipped = flipped;
+	  return true;
 	}
 	
 	//	Driver

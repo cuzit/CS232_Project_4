@@ -139,37 +139,42 @@ public class BoardUI extends JFrame implements ActionListener
 										case 1:
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
 											buttons[x][y].setBackground(Color.white);
+											board.setFlipped(x, y, true);
 										case 2:
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+											board.setFlipped(x, y, true);
 											buttons[x][y].setBackground(Color.white);
 										case 3:
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+											board.setFlipped(x, y, true);
 											buttons[x][y].setBackground(Color.white);
 										case 4:
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+											board.setFlipped(x, y, true);
 											buttons[x][y].setBackground(Color.white);
 										case 5:
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+											board.setFlipped(x, y, true);
 											buttons[x][y].setBackground(Color.white);
 										case 6:
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+											board.setFlipped(x, y, true);
 											buttons[x][y].setBackground(Color.white);
 										case 7:
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+											board.setFlipped(x, y, true);
 											buttons[x][y].setBackground(Color.white);
 										case 8:
 											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+											board.setFlipped(x, y, true);
 											buttons[x][y].setBackground(Color.white);
 										default: 
 											//buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
 											buttons[x][y].setBackground(Color.white);
+											board.setFlipped(x, y, true);
 										
 										
-										if(board.determineWinner())
-										{
-											JOptionPane.showMessageDialog(null, "You have won the game! Starting a new game now.", "CONGRATULATIONS!", JOptionPane.INFORMATION_MESSAGE);
-											board.resetBoard();
-										}
+										
 									}
 								}
 								
@@ -178,6 +183,17 @@ public class BoardUI extends JFrame implements ActionListener
 									// After the number is shown cascade the surrounding numbers
 									//buttons[x][y].setText(String.valueOf(board.returnNumber(x, y))); // used for testing purposes only
 									cascade(x, y);
+								}
+								
+								if(board.determineWinner() == true)
+								{
+									JOptionPane.showMessageDialog(null, "You have won the game! Starting a new game now.", "CONGRATULATIONS!", JOptionPane.INFORMATION_MESSAGE);
+									board.resetBoard();
+								}
+								else { System.out.println("Still no winner. :("); 
+								  System.out.println("Flags Left?: " + flagsAvailable());
+								  System.out.println("Mines left: " + board.returnBombCount());
+								  System.out.println(board.toString());
 								}
 							}
 							
@@ -505,7 +521,7 @@ public class BoardUI extends JFrame implements ActionListener
 				{
 					if(j >= 0 && j < board.returnHeight())
 					{
-						if(board.returnNumber(i, j) == 0)
+						if(board.returnNumber(i, j) == 0 && board.returnFlipped(i, j) == false)
 						{
 						  
 						  
@@ -525,18 +541,18 @@ public class BoardUI extends JFrame implements ActionListener
 						*	the number it stores is permanently irrelevant.
 						*/
 							  buttons[i][j].setBackground(Color.white);
-							  board.setNumber(i, j, -1);
+							  board.setFlipped(i, j, true);
 							  cascade(i, j);
 						}
 					
-						if(board.returnNumber(i, j) != -1)
+						if(board.returnFlipped(i, j) == false)
 						{
 							if(board.returnBomb(i, j) == false)
 							{
 								//Pop it
 								buttons[i][j].setBackground(Color.white);
 								buttons[i][j].setText(String.valueOf(board.returnNumber(i, j)));
-								board.setNumber(i, j, -1);
+								board.setFlipped(i, j, true);
 							}
 						}
 					}

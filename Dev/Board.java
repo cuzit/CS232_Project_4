@@ -220,7 +220,7 @@ public class Board {
       for(int i = 0; i < this.width; i++) {
 	for(int j = 0; j < this.height; j++) {
 	  if(board[i][j].hasBomb() != true) {
-	    if(board[i][j].getNumber() != -1) {
+	    if(board[i][j].isFlipped() != true) {
 	      //This will go through each Location in the
 	      //Board, and if at any point the Location
 	      //both does NOT have a bomb and does NOT
@@ -357,6 +357,11 @@ public class Board {
     return board[x][y].getNumber();
   }
   
+  //Return whether a tile is flipped or not
+  public Boolean returnFlipped(int x, int y) {
+    return board[x][y].isFlipped();
+  }
+  
   /**Setters**/
   //Set a flag at a certain location
   public void setFlag(int x, int y, boolean flag_value) {
@@ -368,6 +373,11 @@ public class Board {
   //Do not call this function otherwise.
   public void setNumber(int x, int y, int number) {
     board[x][y].setNumber(number);
+  }
+  
+  //Change whether a tile has been flipped or not
+  public void setFlipped(int x, int y, boolean flipped) {
+    board[x][y].setFlipped(flipped);
   }
   
   /**toString**/
@@ -508,9 +518,6 @@ public class Board {
     
     
     System.out.println("==Testing Winner=====================");
-    System.out.println("======Before:");
-    System.out.println(twoTest.toString());
-    System.out.println("======After:");
     System.out.println(twoTest.toString());
     boolean test = twoTest.determineWinner();
     if(test) { System.out.println("The game is won!"); }
@@ -518,9 +525,11 @@ public class Board {
     System.out.println("======Force Win:");
     for(int i = 0; i < twoTest.returnWidth(); i++) {
       for(int j = 0; j < twoTest.returnHeight(); j++) {
-	twoTest.setNumber(i, j, -1);
 	if(twoTest.returnBomb(i, j)) {
 	  twoTest.setFlag(i, j, true);
+	}
+	else {
+	  twoTest.setFlipped(i, j, true);
 	}
       }
     }

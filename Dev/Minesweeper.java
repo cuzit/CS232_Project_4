@@ -21,7 +21,7 @@ public class Minesweeper
 			*	Instantiate BoardUI using the width and height
 			*	provided by the user
 			*/
-            window = new BoardUI(width, height, 0);
+            window = new BoardUI(width, height, 10);
         }
 		
 		else if (args.length == 3)
@@ -48,7 +48,7 @@ public class Minesweeper
 			*	If the user doesn't specify a width and height
 			*	then use an 8 x 8 grid as the default
 			*/
-            window = new BoardUI(8, 8, 0);
+            window = new BoardUI(8, 8, 10);
 		}
     }
 }

@@ -31,16 +31,8 @@ public class BoardUI extends JFrame implements ActionListener
     
     public BoardUI(int width, int height, int bombs)
 	{
-		if (bombs == 0)
-		{
-			board = new Board(width, height);
-		}
-		
-		else
-		{
-			board = new Board(width, height, bombs);
-		}
-		
+
+		board = new Board(width, height, 10);		
 		grid = new Location[width][height];
 		this.width = width;
 		this.height = height;
@@ -292,33 +284,44 @@ public class BoardUI extends JFrame implements ActionListener
         
 		// Calls the save game function
         if(e.getSource() == saveGame)
-	{
+        {
             saveGame();
         }
         // class the load game function and starts the timer 
         if(e.getSource() == loadGame)
-	{
-            Location[][] boardArray = loadGame();
-            board = new Board(boardArray);
-            timer = new Timer(1000, timerActionListener);
-            timer.start();
-            
-            resetButtons();
-            for(int i = 0; i < width; i++) {
-	      for(int j = 0; j < height; j++) {
-		if(board.returnFlipped(i, j) == true) {
-		  int num = board.returnNumber(i, j);
-		  buttons[i][j].setText(String.valueOf(board.returnNumber(i, j)));
-		  buttons[i][j].setBackground(Color.white);
+		{
+			Location[][] boardArray = loadGame();
+			board = new Board(boardArray);
+			timer = new Timer(1000, timerActionListener);
+			timer.start();
+				
+			for(int i = 0; i < width; i++)
+			{
+				for(int j = 0; j < height; j++)
+				{
+					if(board.returnFlipped(i, j) == true)
+					{
+						int num = board.returnNumber(i, j);
+						if (num != 0)
+						{
+							buttons[i][j].setText(String.valueOf(board.returnNumber(i, j)));
+							buttons[i][j].setBackground(Color.white);
+						}
+						
+						else
+						{
+							buttons[i][j].setBackground(Color.white);
+						}						
+					}
+					
+					else if(board.returnFlag(i, j) == true)
+					{
+						icon = new ImageIcon("flag.png");
+						buttons[i][j].setIcon(icon);
+					}
+				}
+			}
 		}
-		
-		else if(board.returnFlag(i, j) == true) {
-		  icon = new ImageIcon("flag.png");
-		  buttons[i][j].setIcon(icon);
-		}
-	      }
-            }
-        }
 		
 		for (int i = 0; i < width; i++)
 		{
@@ -351,7 +354,7 @@ public class BoardUI extends JFrame implements ActionListener
             BufferedWriter out = new BufferedWriter(fstream);
             
 			//	Writes static game information to file. 
-            //	Includes: time, width of the board, heigth of the board, and bomb count
+            //	Includes: time, width of the board, height of the board, and bomb count
             out.write(timeLabel.getText() + " ");
             out.write("\n");
             out.write(String.valueOf(board.returnHeight()) + " ");
@@ -361,10 +364,10 @@ public class BoardUI extends JFrame implements ActionListener
             out.write(String.valueOf(board.returnBombCount()) + " ");
             out.write("\n");
 			
-            // loops throgth the board class' locaction array
-            for(int i = 0; i < board.returnHeight(); i++)
+            // loops through the board class' location array
+            for(int i = 0; i < board.returnWidth(); i++)
 			{
-                for(int j = 0; j < board.returnWidth(); j++)
+                for(int j = 0; j < board.returnHeight(); j++)
 				{
                     // if at the current index,  if the location represents a bomb. Write b to the file
                     if(board.returnBomb(i, j))
@@ -372,13 +375,15 @@ public class BoardUI extends JFrame implements ActionListener
                         out.write("b");
                         out.write("\n");
                     }
+                    
                     // if at the current index, if the location represents a flag. Write f to the file
-                    else if(board.returnFlag(i, j))
+                    if(board.returnFlag(i, j))
 					{
                         out.write("f");
                         out.write("\n");
                     }
-                    //If at the current index, if the locaitn is not a flag nor bomb. Write the number of the location to the file
+                    
+                    //If at the current index, if the location is not a flag nor bomb. Write the number of the location to the file
                     else
 					{
                         out.write(Integer.toString(board.returnNumber(i, j)));
@@ -386,11 +391,13 @@ public class BoardUI extends JFrame implements ActionListener
                         //If the tile has been flipped by the player, write
                         //the next line has an 'r'. If it has not been
                         //flipped, write the next line as an 'u.'
-                        if(board.returnFlipped(i, j) == true) {
-			  out.write("r\n");
+                        if(board.returnFlipped(i, j) == true)
+						{
+							out.write("r\n");
                         }
-                        else {
-			  out.write("u\n");
+                        else
+						{
+							out.write("u\n");
                         }
                     }
                 }
@@ -400,7 +407,10 @@ public class BoardUI extends JFrame implements ActionListener
             JOptionPane.showMessageDialog(null, "Your game has been saved.", "Game Saved", JOptionPane.INFORMATION_MESSAGE);
             
         }
-        catch(IOException e) { System.out.println("Unable to write!!");}
+        catch(IOException e)
+		{
+			System.out.println("Unable to write!!");
+		}
     }
 	
 	// Keeps track of number of flags	
@@ -458,7 +468,7 @@ public class BoardUI extends JFrame implements ActionListener
 			width = Integer.parseInt(args[0]);
 			height = Integer.parseInt(args[1]);
 			
-            window = new BoardUI(width, height, 0);
+            window = new BoardUI(width, height, 10);
         }
 		
 		if (args.length == 3)
@@ -471,7 +481,7 @@ public class BoardUI extends JFrame implements ActionListener
 		}
         else
 		{
-            window = new BoardUI(8, 8, 0);
+            window = new BoardUI(8, 8, 10);
 		}
     }
 
@@ -490,8 +500,8 @@ public class BoardUI extends JFrame implements ActionListener
             
 			//	Read in the static game information and assigns to the grid accordingly 
             timeLabel.setText(String.valueOf(reader.nextInt()));
-            width = reader.nextInt();
             height = reader.nextInt();
+            width = reader.nextInt();
             mineLabel.setText(String.valueOf(reader.nextInt()));
             boardArray = new Location[width][height];
             
@@ -509,46 +519,57 @@ public class BoardUI extends JFrame implements ActionListener
 				{
                     // if the item in the linked list is a b, then create a new instance of location and set it represent a bomb
                     // and remove the item form the list
-                    if (list.peek().toString().equals("b"))
-					{
-                        boardArray[i][j] = new Location();
-                        boardArray[i][j].setBomb(true);
-                        list.remove();
-                    }
-                    // if the item in the linked list is a f, then create a new instance of location and set it represent a flag
-                    // and remove the item form the list
-                    else if(list.peek().toString().equals("f"))
-					{
-                        boardArray[i][j] = new Location();
-                        boardArray[i][j].setFlag(true);
-                        list.remove();
-                    }
-                    // if the item in the linked list is not a b nor f, then create a new instance of location and set its number to what is in the list
+                	if (list.peek().toString().equals("b") || list.peek().toString().equals("f"))
+                	{
+	                    if (list.peek().toString().equals("b"))
+						{
+	                        boardArray[i][j] = new Location();
+	                        boardArray[i][j].setBomb(true);
+	                        list.remove();
+	                    }
+	                    
+						// if the item in the linked list is a f, then create a new instance of location and set it represent a flag
+	                    // and remove the item form the list
+	                    if(list.peek().toString().equals("f"))
+						{
+	                        boardArray[i][j] = new Location();
+	                        boardArray[i][j].setFlag(true);
+	                        list.remove();
+	                    }
+                	}
+                    
+					// if the item in the linked list is not a b nor f, then create a new instance of location and set its number to what is in the list
                     // and remove the item form the list
                     else
 					{
                         boardArray[i][j] = new Location();
                         boardArray[i][j].setNumber(new Integer(list.remove().toString()));
-                        //Determine whether the tile is flipped or not
-                        if(list.peek().toString().equals("r")) {
-			  boardArray[i][j].setFlipped(true);
-			  list.remove();
+                        
+						//Determine whether the tile is flipped or not
+                        if(list.peek().toString().equals("r"))
+						{
+							boardArray[i][j].setFlipped(true);
+							list.remove();
                         }
-                        else if(list.peek().toString().equals("u")) {
-			  boardArray[i][j].setFlipped(false);
-			  list.remove();
+						
+                        else if(list.peek().toString().equals("u"))
+						{
+						  boardArray[i][j].setFlipped(false);
+						  list.remove();
                         }
-                        else {
-			  JOptionPane.showMessageDialog(null, "An unknown error has occurred. Please try again.", "Error", JOptionPane.INFORMATION_MESSAGE);
+                        else
+						{
+							JOptionPane.showMessageDialog(null, "An unknown error has occurred. Please try again.", "Error", JOptionPane.INFORMATION_MESSAGE);
                         }
                     }
                 }
             }
-            JOptionPane.showMessageDialog(null, "Successfully loaded previously saved game.", "Load Game", JOptionPane.INFORMATION_MESSAGE);
+            
+			JOptionPane.showMessageDialog(null, "Successfully loaded previously saved game.", "Load Game", JOptionPane.INFORMATION_MESSAGE);
             
             return boardArray;
-            
         }
+		
         catch(FileNotFoundException e)
 		{
             JOptionPane.showMessageDialog(this, "There are no saved games");

@@ -90,139 +90,156 @@ public class BoardUI extends JFrame implements ActionListener
 		
 		buttons = new JButton[width][height];
 		for(int i = 0; i < width; i++)
+		{
+			for(int j = 0; j < height; j++)
 			{
-				for(int j = 0; j < height; j++)
+				buttons[i][j] = new JButton();
+				buttons[i][j].addActionListener(this);
+				layout.add(buttons[i][j]);
+			
+				buttons[i][j].addMouseListener(new MouseAdapter()
 				{
-					buttons[i][j] = new JButton();
-					buttons[i][j].addActionListener(this);
-					layout.add(buttons[i][j]);
-				
-					buttons[i][j].addMouseListener(new MouseAdapter()
-					{
-						//mouse
-						public void mouseClicked (MouseEvent e) 
-						{	
-							if(!started)
-							{
-								clock = new Timer(1000, timerActionListener);
-								clock.start();
-								started = true;
-							}
+					//mouse
+					public void mouseClicked (MouseEvent e) 
+					{	
+						if(!started)
+						{
+							clock = new Timer(1000, timerActionListener);
+							clock.start();
+							started = true;
+						}
 
-							if(e.getButton() == MouseEvent.BUTTON1) 
+						if(e.getButton() == MouseEvent.BUTTON1) 
+						{
+							for(int i = 0;i < board.returnWidth(); i++) 
 							{
+								for(int j = 0; j < board.returnHeight(); j++) 
+								{
+									if(e.getSource().equals(grid[i][j]))
+									{
+										x = i;
+										y = j;
+									}
+								}	
+							}
+							
+							if (board.returnBomb(x, y))
+							{
+								if (started)
+								{
+									clock.stop();
+									started = false;
+								}
+								
+								buttons[x][y].setBackground(Color.white);
+								icon = new ImageIcon("mine.png");
+								
 								for(int i = 0;i < board.returnWidth(); i++) 
 								{
 									for(int j = 0; j < board.returnHeight(); j++) 
 									{
-										if(e.getSource().equals(grid[i][j]))
+										if(board.returnBomb(i, j))
 										{
-											x = i;
-											y = j;
+											buttons[i][j].setIcon(icon);
 										}
 									}	
 								}
-								
-								if (board.returnBomb(x, y))
-								{
-									if (started)
-									{
-										clock.stop();
-										started = false;
-									}
-									
-									buttons[x][y].setBackground(Color.white);
-									icon = new ImageIcon("mine.png");
-									
-									for(int i = 0;i < board.returnWidth(); i++) 
-									{
-										for(int j = 0; j < board.returnHeight(); j++) 
-										{
-											if(board.returnBomb(i, j))
-											{
-												buttons[i][j].setIcon(icon);
-											}
-										}	
-									}
 
-									JOptionPane.showMessageDialog(null,"Game Over!","",JOptionPane.INFORMATION_MESSAGE);
-									board.resetBoard();
-									timeLabel.setText("0");
-									resetButtons();
-								}
-								
-								else if(board.returnNumber(x, y) != 0)
-								{
-									int num = board.returnNumber(x, y);
-									buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
-									buttons[x][y].setBackground(Color.white);
-									board.setFlipped(x, y, true);
-								}
-								
-								
-								else if (board.returnNumber(x, y) == 0)
-								{
-									// After the number is shown cascade the surrounding numbers
-									//buttons[x][y].setText(String.valueOf(board.returnNumber(x, y))); // used for testing purposes only
-									cascade(x, y);
-								}
-								
-								if(board.determineWinner() == true)
-								{
-									if (started)
-									{
-										clock.stop();
-										started = false;
-									}
-									JOptionPane.showMessageDialog(null, "You have won the game in " + timeLabel.getText() + " seconds! Starting a new game now.", "CONGRATULATIONS!", JOptionPane.INFORMATION_MESSAGE);
-									board.resetBoard();
-									resetButtons();
-								}
-								else { System.out.println(board.toString()); }
+								JOptionPane.showMessageDialog(null,"Game Over!","",JOptionPane.INFORMATION_MESSAGE);
+								board.resetBoard();
+								timeLabel.setText("0");
+								resetButtons();
 							}
 							
-							else if(e.getButton() == MouseEvent.BUTTON3) 
+							else if(board.returnNumber(x, y) != 0)
 							{
-								for (int i = 0; i < board.returnWidth(); i++)
+								int num = board.returnNumber(x, y);
+								buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+								buttons[x][y].setBackground(Color.white);
+								board.setFlipped(x, y, true);
+							}
+							
+							
+							else if (board.returnNumber(x, y) == 0)
+							{
+								// After the number is shown cascade the surrounding numbers
+								//buttons[x][y].setText(String.valueOf(board.returnNumber(x, y))); // used for testing purposes only
+								cascade(x, y);
+							}
+							
+							if(board.determineWinner() == true)
+							{
+								if (started)
 								{
-									for (int j = 0; j < board.returnHeight(); j++)
+									clock.stop();
+									started = false;
+								}
+								JOptionPane.showMessageDialog(null, "You have won the game in " + timeLabel.getText() + " seconds! Starting a new game now.", "CONGRATULATIONS!", JOptionPane.INFORMATION_MESSAGE);
+								board.resetBoard();
+								timer = new Timer(1000, timerActionListener);
+								timeLabel.setText("0");
+								mineLabel.setText(Integer.toString(board.determineBombCount()));
+								resetButtons();
+							}
+						}
+						
+						else if(e.getButton() == MouseEvent.BUTTON3) 
+						{
+							for (int i = 0; i < board.returnWidth(); i++)
+							{
+								for (int j = 0; j < board.returnHeight(); j++)
+								{
+									if (e.getSource() == buttons[i][j])
 									{
-										if (e.getSource() == buttons[i][j])
-										{
-											x = i;
-											y = j;
-										}
+										x = i;
+										y = j;
 									}
 								}
-								
-								if(flagsAvailable())
+							}
+							
+							if(flagsAvailable())
+							{
+								if(!board.returnFlag(x, y))
 								{
-									if(!board.returnFlag(x, y))
-									{
-										board.setFlag(x, y, true);
-										icon = new ImageIcon("flag.png");
-										buttons[x][y].setIcon(icon);
-									}
-									
-									else 
-									{
-										board.setFlag(x, y, false);
-										buttons[x][y].setIcon(null);
-									}
-									updateMineNum();
+									board.setFlag(x, y, true);
+									icon = new ImageIcon("flag.png");
+									buttons[x][y].setIcon(icon);
 								}
 								
-								else
+								else 
 								{
 									board.setFlag(x, y, false);
 									buttons[x][y].setIcon(null);
 								}
+								updateMineNum();
 							}
 							
+							else
+							{
+								board.setFlag(x, y, false);
+								buttons[x][y].setIcon(null);
+							}
+							
+							if(board.determineWinner() == true)
+							{
+								if (started)
+								{
+									clock.stop();
+									started = false;
+								}
+								JOptionPane.showMessageDialog(null, "You have won the game in " + timeLabel.getText() + " seconds! Starting a new game now.", "CONGRATULATIONS!", JOptionPane.INFORMATION_MESSAGE);
+								board.resetBoard();
+								timer = new Timer(1000, timerActionListener);
+								timeLabel.setText("0");
+								mineLabel.setText(Integer.toString(board.determineBombCount()));
+								resetButtons();
+							}
 						}
-					});
-				}
+						
+					}
+				});
 			}
+		}
 			
         add(topPanel, BorderLayout.NORTH);
 		add(layout, BorderLayout.CENTER);
@@ -240,7 +257,8 @@ public class BoardUI extends JFrame implements ActionListener
     public void actionPerformed(ActionEvent e)
 	{
         // creates a new board class and reset the timer and bomb label
-        if(e.getSource() == startNew){
+        if(e.getSource() == startNew)
+		{
             board = new Board();
 			this.dispose();
 			new BoardUI(board.returnWidth(), board.returnHeight(), board.returnBombCount());
@@ -286,6 +304,7 @@ public class BoardUI extends JFrame implements ActionListener
             // that represent the loaded game. One way to due this is to create a contructor in the board class that 
             // takes in a 2d array of locations as a parameter. Then set all the private attributes 
             // of the board based on the 2d array passed in.
+            board = new Board(boardArray);
             timer = new Timer(1000, timerActionListener);
             timer.start();
         }
@@ -435,7 +454,7 @@ public class BoardUI extends JFrame implements ActionListener
     }
 
 
-    //loads the game by reading the contents of the file into a 2-d array of locations
+    //	Loads the game by reading the contents of the file into a 2-D array of locations
     public Location[][] loadGame()
 	{
         int width, height;
@@ -496,7 +515,7 @@ public class BoardUI extends JFrame implements ActionListener
         }
         catch(FileNotFoundException e)
 		{
-            System.out.println(e.toString());
+            JOptionPane.showMessageDialog(this, "There are no saved games");
             return new Location[0][0];
         }
     }

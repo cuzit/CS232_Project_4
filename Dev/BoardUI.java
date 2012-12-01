@@ -29,9 +29,18 @@ public class BoardUI extends JFrame implements ActionListener
 	private int x;
 	private int y;
     
-    public BoardUI(int width, int height)
+    public BoardUI(int width, int height, int bombs)
 	{
-		board = new Board(width, height);
+		if (bombs == 0)
+		{
+			board = new Board(width, height);
+		}
+		
+		else
+		{
+			board = new Board(width, height, bombs);
+		}
+		
 		grid = new Location[width][height];
 		this.width = width;
 		this.height = height;
@@ -119,15 +128,26 @@ public class BoardUI extends JFrame implements ActionListener
 									if (started)
 									{
 										clock.stop();
+										started = false;
 									}
 									
 									buttons[x][y].setBackground(Color.white);
 									icon = new ImageIcon("mine.png");
-									buttons[x][y].setIcon(icon);
+									
+									for(int i = 0;i < board.returnWidth(); i++) 
+									{
+										for(int j = 0; j < board.returnHeight(); j++) 
+										{
+											if(board.returnBomb(i, j))
+											{
+												buttons[i][j].setIcon(icon);
+											}
+										}	
+									}
+
 									JOptionPane.showMessageDialog(null,"Game Over!","",JOptionPane.INFORMATION_MESSAGE);
 									board.resetBoard();
 									timeLabel.setText("0");
-									started = false;
 									resetButtons();
 								}
 								
@@ -243,7 +263,7 @@ public class BoardUI extends JFrame implements ActionListener
         if(e.getSource() == startNew){
             board = new Board();
 			this.dispose();
-			new BoardUI(board.returnWidth(), board.returnHeight());
+			new BoardUI(board.returnWidth(), board.returnHeight(), board.returnBombCount());
 			if (started)
 			{
 				clock.stop();
@@ -407,19 +427,32 @@ public class BoardUI extends JFrame implements ActionListener
 	}
 	
 	public static void main(String[] args)
-	{
-		BoardUI window;
-		if(args.length == 2)
-		{
-			int width = Integer.parseInt(args[0]);
-			int height = Integer.parseInt(args[1]);
+    {
+        BoardUI window;
+		int width = 0;
+		int height = 0;
+		int bombs = 0;
+        if(args.length == 2)
+        {
+			width = Integer.parseInt(args[0]);
+			height = Integer.parseInt(args[1]);
 			
-			window = new BoardUI(width, height);
+            window = new BoardUI(width, height, 0);
+        }
+		
+		if (args.length == 3)
+		{
+			width = Integer.parseInt(args[0]);
+			height = Integer.parseInt(args[1]);
+			bombs = Integer.parseInt(args[2]);
+					
+			window = new BoardUI(width, height, bombs);
 		}
-		else
-			window = new BoardUI(8,8);
-		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	}
+        else
+		{
+            window = new BoardUI(8, 8, 0);
+		}
+    }
 
 
     //loads the game by reading the contents of the file into a 2-d array of locations

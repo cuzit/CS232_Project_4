@@ -154,36 +154,8 @@ public class BoardUI extends JFrame implements ActionListener
 								else if(board.returnNumber(x, y) != 0)
 								{
 									int num = board.returnNumber(x, y);
-									switch(num)
-									{
-										case 1:
-											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
-											buttons[x][y].setBackground(Color.white);
-										case 2:
-											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
-											buttons[x][y].setBackground(Color.white);
-										case 3:
-											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
-											buttons[x][y].setBackground(Color.white);
-										case 4:
-											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
-											buttons[x][y].setBackground(Color.white);
-										case 5:
-											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
-											buttons[x][y].setBackground(Color.white);
-										case 6:
-											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
-											buttons[x][y].setBackground(Color.white);
-										case 7:
-											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
-											buttons[x][y].setBackground(Color.white);
-										case 8:
-											buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
-											buttons[x][y].setBackground(Color.white);
-										default: 
-											//buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
-											buttons[x][y].setBackground(Color.white);
-										
+									buttons[x][y].setText(String.valueOf(board.returnNumber(x, y)));
+									buttons[x][y].setBackground(Color.white);										
 										
 										if(board.determineWinner())
 										{
